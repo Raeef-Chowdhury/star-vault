@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 function Header() {
   return (
     <>
-      <header className="p-[2rem] bg-header flex items-center min-w-[1920px]">
+      <header className="p-[2rem] bg-header flex items-center max-w-[1920px]">
         <ul className="pb-[1.5rem] flex items-center justify-between w-full">
           <li className="flex items-center gap-[1.8rem] text-text text-[4.8rem] tracking-[1.2rem]">
             <Sparkles className="p-6 rounded-full w-20 h-20 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]" />

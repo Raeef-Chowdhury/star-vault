@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable react/prop-types */
 import React, { useRef, useMemo, useState } from "react";
@@ -5,8 +6,100 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/three";
+import { useThree } from "@react-three/fiber";
 import Stars from "../Stars";
+function EllipticalGalaxy({
+  count = 8000,
+  radiusX = 8,
+  radiusY = 5,
+  radiusZ = 8,
+  color = "#ff8844",
+}) {
+  const pointsRef = useRef();
 
+  // Generate elliptical distribution with dense core
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      // Use power distribution for denser core
+      const r = Math.pow(Math.random(), 0.5);
+
+      // Random spherical coordinates
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      // Elliptical shape with varying radii
+      const x = r * radiusX * Math.sin(phi) * Math.cos(theta);
+      const y = r * radiusY * Math.sin(phi) * Math.sin(theta);
+      const z = r * radiusZ * Math.cos(phi);
+
+      // Add slight randomness
+      const scatter = 0.3 * (1 - r); // Less scatter near core
+      pos.set(
+        [
+          x + (Math.random() - 0.5) * scatter,
+          y + (Math.random() - 0.5) * scatter,
+          z + (Math.random() - 0.5) * scatter,
+        ],
+        i * 3
+      );
+    }
+
+    return pos;
+  }, [count, radiusX, radiusY, radiusZ]);
+
+  // Vary star sizes based on distance from core
+  const sizes = useMemo(() => {
+    const sizeArray = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      const x = positions[i * 3];
+      const y = positions[i * 3 + 1];
+      const z = positions[i * 3 + 2];
+      const distFromCore = Math.sqrt(x * x + y * y + z * z);
+
+      // Stars near core are bigger and brighter
+      sizeArray[i] = 0.05 - (distFromCore / radiusX) * 0.03;
+    }
+
+    return sizeArray;
+  }, [positions, radiusX]);
+
+  // Slow tumbling rotation
+  useFrame(() => {
+    pointsRef.current.rotation.x += 0.0003;
+    pointsRef.current.rotation.y += 0.0005;
+  });
+
+  return (
+    <points ref={pointsRef} position={[50, 0, 0]}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={count}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          array={sizes}
+          count={count}
+          itemSize={1}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.03}
+        color={color}
+        sizeAttenuation
+        depthWrite={false}
+        transparent
+        opacity={0.8}
+        blending={2}
+      />
+    </points>
+  );
+}
 function SpiralGalaxy({
   count = 5000,
   radius = 10,
@@ -40,7 +133,7 @@ function SpiralGalaxy({
   });
 
   return (
-    <points ref={pointsRef}>
+    <points ref={pointsRef} position={[0, 0, 50]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -149,14 +242,18 @@ function ConnectionLines() {
 
 function Scence() {
   return (
-    <div className="h-[100vh] w-[100vw] bg-blck">
+    <div className="h-[100vh] w-[100vw] relative bg-black">
+      <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+        UNIVERSE
+      </p>
       <Canvas
-        camera={{ position: [-17.5, 16, 35], fov: 60 }}
+        camera={{ position: [-2.4, 3.4, -2.6], fov: 100 }}
         style={{
           width: "100%",
           height: "100%",
         }}
       >
+        {/* <CameraLogger /> */}
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <ConnectionLines />
@@ -166,14 +263,13 @@ function Scence() {
           <Sphere key={idx} {...sphere} />
         ))}
         <SpiralGalaxy />
+        <EllipticalGalaxy />
         <OrbitControls
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={10}
+          minDistance={17.5}
           maxDistance={100}
-          autoRotate={true}
-          autoRotateSpeed={0.5}
           blending={2}
           touches={{
             ONE: 2,
@@ -181,6 +277,9 @@ function Scence() {
           }}
         />
       </Canvas>
+      <p className="text-gray-200 opacity-40 text-[2.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[1rem] ">
+        Select a Galaxy to Explore
+      </p>
     </div>
   );
 }
