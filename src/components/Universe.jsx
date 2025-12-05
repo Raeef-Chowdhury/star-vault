@@ -6,8 +6,290 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/three";
-import { useThree } from "@react-three/fiber";
 import Stars from "../Stars";
+function LenticularGalaxy({
+  count = 15000,
+  diskRadius = 10,
+  diskThickness = 0.8,
+  bulgeRadius = 3,
+  color = "#497d00",
+}) {
+  const pointsRef = useRef();
+
+  const { positions, sizes } = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const sizeArray = new Float32Array(count);
+
+    // Split between bulge and disk
+    const bulgeCount = Math.floor(count * 0.4); // 40% in central bulge
+    const diskCount = count - bulgeCount;
+
+    let idx = 0;
+
+    // Create bright central bulge (spherical)
+    for (let i = 0; i < bulgeCount; i++) {
+      const r = Math.pow(Math.random(), 0.7) * bulgeRadius;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta) * 0.7; // Slightly flattened
+      const z = r * Math.cos(phi);
+
+      pos.set([x, y, z], idx * 3);
+
+      // Brighter stars in bulge
+      sizeArray[idx] = 0.04 + Math.random() * 0.03;
+      idx++;
+    }
+
+    // Create smooth disk with NO spiral arms
+    for (let i = 0; i < diskCount; i++) {
+      // Exponential distribution for realistic disk
+      const r =
+        bulgeRadius + Math.pow(Math.random(), 0.5) * (diskRadius - bulgeRadius);
+      const theta = Math.random() * Math.PI * 2;
+
+      const x = r * Math.cos(theta);
+      const z = r * Math.sin(theta);
+
+      // Very thin disk with slight variation
+      const y =
+        (Math.random() - 0.5) * diskThickness * Math.exp(-r / diskRadius);
+
+      pos.set([x, y, z], idx * 3);
+
+      // Dimmer stars in outer disk
+      sizeArray[idx] = 0.015 * (1 - (r / diskRadius) * 0.5);
+      idx++;
+    }
+
+    return { positions: pos, sizes: sizeArray };
+  }, [count, diskRadius, diskThickness, bulgeRadius]);
+
+  // Smooth rotation like a record
+  useFrame(() => {
+    pointsRef.current.rotation.y += 0.0008;
+  });
+
+  return (
+    <points ref={pointsRef} position={[-15, 0, 20]}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={count}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          array={sizes}
+          count={count}
+          itemSize={1}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.025}
+        color={color}
+        sizeAttenuation
+        depthWrite={false}
+        transparent
+        opacity={0.9}
+        blending={2}
+        toneMapped={false}
+      />
+    </points>
+  );
+}
+
+function TriangleGalaxy({
+  count = 10000,
+  mainRadius = 6,
+  blobCount = 3,
+  color = "#ff66aa",
+}) {
+  const pointsRef = useRef();
+
+  const { positions, sizes } = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const sizeArray = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      // Create multiple irregular "blobs" of star formation
+      const blobIndex = Math.floor(Math.random() * blobCount);
+      const blobAngle = (blobIndex / blobCount) * Math.PI * 2;
+
+      // Offset each blob from center
+      const blobDistance = mainRadius * (0.3 + Math.random() * 0.7);
+      const blobCenterX = Math.cos(blobAngle) * blobDistance;
+      const blobCenterZ = Math.sin(blobAngle) * blobDistance;
+
+      // Random position within blob using exponential distribution
+      const r = Math.pow(Math.random(), 1.5) * mainRadius * 0.6;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      const x = blobCenterX + r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta) * 0.4; // Flatter
+      const z = blobCenterZ + r * Math.cos(phi);
+
+      // Add chaotic scatter
+      const scatter = 1.5;
+      pos.set(
+        [
+          x + (Math.random() - 0.5) * scatter,
+          y + (Math.random() - 0.5) * scatter * 0.5,
+          z + (Math.random() - 0.5) * scatter,
+        ],
+        i * 3
+      );
+
+      // Varied star sizes
+      sizeArray[i] = 0.015 + Math.random() * 0.04;
+    }
+
+    return { positions: pos, sizes: sizeArray };
+  }, [count, mainRadius, blobCount]);
+
+  // Chaotic, multi-axis rotation
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    pointsRef.current.rotation.x = Math.sin(t * 0.1) * 0.2;
+    pointsRef.current.rotation.y += 0.0004;
+    pointsRef.current.rotation.z = Math.cos(t * 0.15) * 0.1;
+  });
+
+  return (
+    <points ref={pointsRef} position={[-15, 0, -15]}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={count}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          array={sizes}
+          count={count}
+          itemSize={1}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.03}
+        color={color}
+        sizeAttenuation
+        depthWrite={false}
+        transparent
+        opacity={0.85}
+        blending={2}
+        toneMapped={false}
+      />
+    </points>
+  );
+}
+
+function RingGalaxy({
+  count = 12000,
+  innerRadius = 4,
+  outerRadius = 12,
+  ringThickness = 1.5,
+  color = "#4488ff",
+}) {
+  const pointsRef = useRef();
+
+  // Generate ring/hourglass galaxy distribution
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      // Create ring structure with gap in middle
+      const ringPos = Math.random();
+      const radius = innerRadius + ringPos * (outerRadius - innerRadius);
+
+      // Random angle around the ring
+      const theta = Math.random() * Math.PI * 2;
+
+      // Height varies - creates the ring/torus shape
+      const heightFactor = Math.pow(Math.random(), 2);
+      const height = (Math.random() - 0.5) * ringThickness * heightFactor;
+
+      // Position in ring
+      const x = radius * Math.cos(theta);
+      const z = radius * Math.sin(theta);
+      const y = height;
+
+      // Add turbulence that increases with radius
+      const turbulence = 0.3 * (radius / outerRadius);
+      pos.set(
+        [
+          x + (Math.random() - 0.5) * turbulence,
+          y + (Math.random() - 0.5) * turbulence * 0.5,
+          z + (Math.random() - 0.5) * turbulence,
+        ],
+        i * 3
+      );
+    }
+
+    return pos;
+  }, [count, innerRadius, outerRadius, ringThickness]);
+
+  // Vary star sizes - brighter in the ring itself
+  const sizes = useMemo(() => {
+    const sizeArray = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      const x = positions[i * 3];
+      const y = positions[i * 3 + 1];
+      const z = positions[i * 3 + 2];
+
+      const radiusFromCenter = Math.sqrt(x * x + z * z);
+      const heightFromPlane = Math.abs(y);
+
+      // Stars in the ring plane are brighter
+      const planeFactor = 1 - Math.min(heightFromPlane / ringThickness, 1);
+      const ringFactor = radiusFromCenter > innerRadius ? 1 : 0.5;
+
+      sizeArray[i] = 0.02 + planeFactor * 0.04 * ringFactor;
+    }
+
+    return sizeArray;
+  }, [positions, innerRadius, ringThickness]);
+
+  // Rotate the ring galaxy
+  useFrame(() => {
+    pointsRef.current.rotation.y += 0.0061;
+    pointsRef.current.rotation.x = Math.sin(Date.now() * 0.0001) * 0.1;
+  });
+
+  return (
+    <points ref={pointsRef} position={[10, 0, -25]}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={count}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          array={sizes}
+          count={count}
+          itemSize={1}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.04}
+        color={color}
+        sizeAttenuation
+        depthWrite={false}
+        transparent
+        opacity={0.9}
+        blending={2}
+      />
+    </points>
+  );
+}
 function EllipticalGalaxy({
   count = 8000,
   radiusX = 8,
@@ -69,11 +351,11 @@ function EllipticalGalaxy({
   // Slow tumbling rotation
   useFrame(() => {
     pointsRef.current.rotation.x += 0.0003;
-    pointsRef.current.rotation.y += 0.0005;
+    pointsRef.current.rotation.y += 0.0105;
   });
 
   return (
-    <points ref={pointsRef} position={[50, 0, 0]}>
+    <points ref={pointsRef} position={[30, 0, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -129,11 +411,11 @@ function SpiralGalaxy({
   }, [count, radius, rotations]);
 
   useFrame(() => {
-    pointsRef.current.rotation.y += 0.0008;
+    pointsRef.current.rotation.y += 0.0058;
   });
 
   return (
-    <points ref={pointsRef} position={[0, 0, 50]}>
+    <points ref={pointsRef} position={[25, 0, 35]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -239,7 +521,6 @@ function ConnectionLines() {
 
 //   return null; // Don't return console.log, return null or JSX
 // }
-
 function Scence() {
   return (
     <div className="h-[100vh] w-[100vw] relative bg-black">
@@ -247,7 +528,7 @@ function Scence() {
         UNIVERSE
       </p>
       <Canvas
-        camera={{ position: [-2.4, 3.4, -2.6], fov: 100 }}
+        camera={{ position: [5, 14, -2], fov: 100 }}
         style={{
           width: "100%",
           height: "100%",
@@ -264,6 +545,9 @@ function Scence() {
         ))}
         <SpiralGalaxy />
         <EllipticalGalaxy />
+        <RingGalaxy />
+        <TriangleGalaxy />
+        <LenticularGalaxy />
         <OrbitControls
           enablePan={true}
           enableZoom={true}

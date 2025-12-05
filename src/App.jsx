@@ -3,6 +3,8 @@ import Header from "./components/header";
 import Scence from "./components/Universe";
 
 //TODO:Only Galaxies in Main Universe Scence
+//TODO:ADD REFACTORING EACH GALAXY EACH COMPOENENTs
+//TODO: ADD GALAXiES HOVERING EFFECT & BOTTOM CATEOGRY LIST
 //TODO: Unique Galaxies UI (SPiral,GLow,Black Hole,Ring,etc..)
 //TODO: ADD GAALXY/MEMORY UI form in header
 //TODO: INDIVIDUAL STARS IN GALAXY
