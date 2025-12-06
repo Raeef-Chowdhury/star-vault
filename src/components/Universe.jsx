@@ -1,11 +1,15 @@
 /* eslint-disable no-undef */
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable react/prop-types */
-import React, { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState } from "react";
+
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useSpring, animated } from "@react-spring/three";
+import { useNavigate } from "react-router";
+import { useSpring } from "@react-spring/three";
+import { Html } from "@react-three/drei";
+import { animated } from "@react-spring/three";
 import Stars from "../Stars";
 function LenticularGalaxy({
   count = 15000,
@@ -69,11 +73,11 @@ function LenticularGalaxy({
 
   // Smooth rotation like a record
   useFrame(() => {
-    pointsRef.current.rotation.y += 0.0008;
+    pointsRef.current.rotation.y += 0.0038;
   });
 
   return (
-    <points ref={pointsRef} position={[-15, 0, 20]}>
+    <points ref={pointsRef} position={[-30, 0, 40]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -102,14 +106,21 @@ function LenticularGalaxy({
   );
 }
 
-function TriangleGalaxy({
+function EmotionGalaxy({
   count = 10000,
   mainRadius = 6,
   blobCount = 3,
   color = "#ff66aa",
 }) {
-  const pointsRef = useRef();
+  const [hovered, isHovered] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
 
+  const { scale } = useSpring({
+    scale: hovered ? 1.1 : 1,
+    config: { tension: 300, friction: 10 },
+  });
+  const pointsRef = useRef();
+  const navigate = useNavigate();
   const { positions, sizes } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const sizeArray = new Float32Array(count);
@@ -155,37 +166,69 @@ function TriangleGalaxy({
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     pointsRef.current.rotation.x = Math.sin(t * 0.1) * 0.2;
-    pointsRef.current.rotation.y += 0.0004;
+    pointsRef.current.rotation.y += 0.0304;
     pointsRef.current.rotation.z = Math.cos(t * 0.15) * 0.1;
   });
-
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2) - 10,
+    });
+  };
+  const handleClick = () => {
+    navigate("/emotions");
+  };
   return (
-    <points ref={pointsRef} position={[-15, 0, -15]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={count}
-          itemSize={3}
+    <>
+      {hovered ? (
+        <Html position={[cursorPos.x, cursorPos.y, cursorPos.z]}>
+          <span className="text-[2.4rem] transition-opacity duration-300 pointer-events-none bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-xl before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-b-slate-800">
+            EMOTIONS
+          </span>
+        </Html>
+      ) : null}
+      <animated.points
+        ref={pointsRef}
+        onClick={handleClick}
+        onPointerMove={handlePointerMove}
+        onPointerOver={() => {
+          isHovered(true);
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          isHovered(false);
+          document.body.style.cursor = "default";
+        }}
+        scale={scale}
+        position={[-30, 0, -20]}
+      >
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            array={positions}
+            count={count}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-size"
+            array={sizes}
+            count={count}
+            itemSize={1}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.03}
+          color={color}
+          sizeAttenuation
+          depthWrite={false}
+          transparent
+          opacity={hovered ? 0.85 : 0.2}
+          blending={2}
+          toneMapped={false}
         />
-        <bufferAttribute
-          attach="attributes-size"
-          array={sizes}
-          count={count}
-          itemSize={1}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.03}
-        color={color}
-        sizeAttenuation
-        depthWrite={false}
-        transparent
-        opacity={0.85}
-        blending={2}
-        toneMapped={false}
-      />
-    </points>
+      </animated.points>
+    </>
   );
 }
 
@@ -263,7 +306,7 @@ function RingGalaxy({
   });
 
   return (
-    <points ref={pointsRef} position={[10, 0, -25]}>
+    <points ref={pointsRef} position={[20, 0, -50]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -355,7 +398,7 @@ function EllipticalGalaxy({
   });
 
   return (
-    <points ref={pointsRef} position={[30, 0, 0]}>
+    <points ref={pointsRef} position={[60, 0, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -415,7 +458,7 @@ function SpiralGalaxy({
   });
 
   return (
-    <points ref={pointsRef} position={[25, 0, 35]}>
+    <points ref={pointsRef} position={[30, 0, 50]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -434,82 +477,8 @@ function SpiralGalaxy({
   );
 }
 
-const spheresData = [
-  { position: [-15, 0, 2], color: "#ef4444" },
-  { position: [-10, 0, 1], color: "#22c55e" },
-  { position: [-5, 0, 4], color: "#3b82f6" },
-  { position: [5, 0, 6], color: "#eab308" },
-  { position: [10.5, 0, 7], color: "#a855f7" },
-  { position: [15, 0, 20], color: "#06b6d4" },
-];
-
-function Sphere({ position, color }) {
-  const [hovered, isHovered] = useState(false);
-  const { scale } = useSpring({
-    scale: hovered ? 1.4 : 1,
-    config: { tension: 300, friction: 10 },
-  });
-  return (
-    <group
-      position={position}
-      onPointerEnter={() => {
-        isHovered(true);
-      }}
-      onPointerOut={() => {
-        isHovered(false);
-      }}
-    >
-      <mesh>
-        <sphereGeometry args={[1.5, 32, 32]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.25}
-          depthWrite={false}
-        />
-      </mesh>
-
-      <animated.mesh scale={scale}>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial color={color} />
-      </animated.mesh>
-    </group>
-  );
-}
-function ConnectionLines() {
-  const linesRef = useRef();
-
-  const linePositions = React.useMemo(() => {
-    const positions = [];
-
-    // Create a chain: connect each sphere to the next one only
-    for (let i = 0; i < spheresData.length - 1; i++) {
-      positions.push(...spheresData[i].position);
-      positions.push(...spheresData[i + 1].position);
-    }
-
-    return new Float32Array(positions);
-  }, []);
-
-  return (
-    <lineSegments ref={linesRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={linePositions.length / 3}
-          array={linePositions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial
-        color="#ffffff"
-        transparent
-        opacity={0.15}
-        depthWrite={false}
-      />
-    </lineSegments>
-  );
-}
+// _Euler{isEuler: true, _x: -1.522432954819884, _y: -0.8904371932992801, _z: -1.5086121012837603, _order: 'XYZ'…}
+// _Vector3{x: -30.908306195639387, y: 24.983470859504337, z: 1.2092278424420602}x: -30.908306195639387y: 24.983470859504337z: 1.2092278424420602[[Prototype]]: Object
 
 // function CameraLogger() {
 //   const { camera } = useThree();
@@ -528,7 +497,7 @@ function Scence() {
         UNIVERSE
       </p>
       <Canvas
-        camera={{ position: [5, 14, -2], fov: 100 }}
+        camera={{ position: [-30, 24, 1.2], fov: 100 }}
         style={{
           width: "100%",
           height: "100%",
@@ -537,23 +506,19 @@ function Scence() {
         {/* <CameraLogger /> */}
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
-        <ConnectionLines />
         <Stars />
 
-        {spheresData.map((sphere, idx) => (
-          <Sphere key={idx} {...sphere} />
-        ))}
         <SpiralGalaxy />
         <EllipticalGalaxy />
         <RingGalaxy />
-        <TriangleGalaxy />
+        <EmotionGalaxy />
         <LenticularGalaxy />
         <OrbitControls
-          enablePan={true}
+          enablePan={false}
           enableZoom={true}
           enableRotate={true}
-          minDistance={17.5}
-          maxDistance={100}
+          minDistance={50}
+          maxDistance={200}
           blending={2}
           touches={{
             ONE: 2,
