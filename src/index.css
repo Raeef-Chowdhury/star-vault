@@ -31,7 +31,7 @@ html {
   --color-tertiary: #5a7fa3;
   --color-shade: #b8a3d6;
   --color-text: #e8e4f3;
-
+  --color-emotion: #ff66aa;
   --color-light-blue: oklch(85% 0.08 260);
   --color-amber: oklch(88% 0.1 80);
   --color-background: #0a0e1a;

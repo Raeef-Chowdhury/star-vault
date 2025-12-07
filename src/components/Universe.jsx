@@ -4,13 +4,14 @@
 import { useRef, useMemo, useState } from "react";
 
 import { Canvas } from "@react-three/fiber";
+
 import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useNavigate } from "react-router";
 import { useSpring } from "@react-spring/three";
-import { Html } from "@react-three/drei";
 import { animated } from "@react-spring/three";
 import Stars from "../Stars";
+import GalaxyHoverUI from "./GalaxyHoverUI";
 function LenticularGalaxy({
   count = 15000,
   diskRadius = 10,
@@ -95,11 +96,11 @@ function LenticularGalaxy({
       <pointsMaterial
         size={0.025}
         color={color}
-        sizeAttenuation
-        depthWrite={false}
+        sizeAttenuation={false}
+        depthWrite={true}
         transparent
         opacity={0.9}
-        blending={2}
+        blending={1}
         toneMapped={false}
       />
     </points>
@@ -107,18 +108,26 @@ function LenticularGalaxy({
 }
 
 function EmotionGalaxy({
-  count = 10000,
-  mainRadius = 6,
+  count = 20000,
+  mainRadius = 10,
   blobCount = 3,
   color = "#ff66aa",
 }) {
   const [hovered, isHovered] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
 
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2),
+    });
+  };
   const { scale } = useSpring({
-    scale: hovered ? 1.1 : 1,
-    config: { tension: 300, friction: 10 },
+    scale: hovered ? 1.4 : 1,
+    config: { tension: 200, friction: 20 },
   });
+
   const pointsRef = useRef();
   const navigate = useNavigate();
   const { positions, sizes } = useMemo(() => {
@@ -169,34 +178,24 @@ function EmotionGalaxy({
     pointsRef.current.rotation.y += 0.0304;
     pointsRef.current.rotation.z = Math.cos(t * 0.15) * 0.1;
   });
-  const handlePointerMove = (e) => {
-    setCursorPos({
-      x: e.point.x.toFixed(2),
-      y: e.point.y.toFixed(2) - 10,
-      z: e.point.z.toFixed(2) - 10,
-    });
-  };
+
   const handleClick = () => {
     navigate("/emotions");
   };
   return (
     <>
       {hovered ? (
-        <Html position={[cursorPos.x, cursorPos.y, cursorPos.z]}>
-          <span className="text-[2.4rem] transition-opacity duration-300 pointer-events-none bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-xl before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-b-slate-800">
-            EMOTIONS
-          </span>
-        </Html>
+        <GalaxyHoverUI galaxyNAME={"Emotions"} cursorPos={cursorPos} />
       ) : null}
       <animated.points
         ref={pointsRef}
         onClick={handleClick}
         onPointerMove={handlePointerMove}
-        onPointerOver={() => {
+        onPointerEnter={() => {
           isHovered(true);
           document.body.style.cursor = "pointer";
         }}
-        onPointerOut={() => {
+        onPointerLeave={() => {
           isHovered(false);
           document.body.style.cursor = "default";
         }}
@@ -220,11 +219,11 @@ function EmotionGalaxy({
         <pointsMaterial
           size={0.03}
           color={color}
-          sizeAttenuation
-          depthWrite={false}
+          sizeAttenuation={false}
+          depthWrite={true}
           transparent
           opacity={hovered ? 0.85 : 0.2}
-          blending={2}
+          blending={hovered ? 2 : 1}
           toneMapped={false}
         />
       </animated.points>
@@ -324,11 +323,11 @@ function RingGalaxy({
       <pointsMaterial
         size={0.04}
         color={color}
-        sizeAttenuation
-        depthWrite={false}
+        sizeAttenuation={false}
+        depthWrite={true}
         transparent
         opacity={0.9}
-        blending={2}
+        blending={1}
       />
     </points>
   );
@@ -416,11 +415,11 @@ function EllipticalGalaxy({
       <pointsMaterial
         size={0.03}
         color={color}
-        sizeAttenuation
-        depthWrite={false}
+        sizeAttenuation={false}
+        depthWrite={true}
         transparent
         opacity={0.8}
-        blending={2}
+        blending={1}
       />
     </points>
   );
@@ -470,8 +469,8 @@ function SpiralGalaxy({
       <pointsMaterial
         size={0.02}
         color={color}
-        sizeAttenuation
-        depthWrite={false}
+        sizeAttenuation={false}
+        depthWrite={true}
       />
     </points>
   );
@@ -519,16 +518,50 @@ function Scence() {
           enableRotate={true}
           minDistance={50}
           maxDistance={200}
-          blending={2}
+          blending={1}
           touches={{
             ONE: 2,
             TWO: 1,
           }}
         />
       </Canvas>
-      <p className="text-gray-200 opacity-40 text-[2.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[1rem] ">
-        Select a Galaxy to Explore
-      </p>
+      <ul className="flex gap-[10rem] absolute flex-col left-10  top-75  rounded-2xl p-[1rem]">
+        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer   justify-center">
+          <div className="bg-emotion w-[1.25rem] h-[1.25rem] rounded-full"></div>
+          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
+            {" "}
+            EMOTIONS
+          </span>
+        </li>
+        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
+          <div className="bg-green-600 w-[1.25rem] h-[1.25rem] rounded-full"></div>
+          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
+            {" "}
+            TRAVEL
+          </span>
+        </li>
+        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
+          <div className="bg-blue-700 w-[1.25rem] h-[1.25rem] rounded-full"></div>
+          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
+            {" "}
+            CAREER
+          </span>
+        </li>
+        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
+          <div className="bg-amber-500 w-[1.25rem] h-[1.25rem] rounded-full"></div>
+          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
+            {" "}
+            PERSONAL
+          </span>
+        </li>
+        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
+          <div className="bg-purple-500 w-[1.25rem] h-[1.25rem] rounded-full"></div>
+          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
+            {" "}
+            MILESTONES
+          </span>
+        </li>
+      </ul>
     </div>
   );
 }
