@@ -32,6 +32,9 @@ html {
   --color-shade: #b8a3d6;
   --color-text: #e8e4f3;
   --color-emotion: #ff66aa;
+  --color-travel: #497d00;
+  --color-career: #4488ff;
+  --color-personal: #8200db;
   --color-light-blue: oklch(85% 0.08 260);
   --color-amber: oklch(88% 0.1 80);
   --color-background: #0a0e1a;

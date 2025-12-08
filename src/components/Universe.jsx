@@ -12,14 +12,31 @@ import { useSpring } from "@react-spring/three";
 import { animated } from "@react-spring/three";
 import Stars from "../Stars";
 import GalaxyHoverUI from "./GalaxyHoverUI";
-function LenticularGalaxy({
+const sideBar = ["emotion", "travel", "career", "personal", "milestones"];
+function TravelGalaxy({
   count = 15000,
   diskRadius = 10,
   diskThickness = 0.8,
   bulgeRadius = 3,
   color = "#497d00",
 }) {
+  const [hovered, isHovered] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
+
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2),
+    });
+  };
+  const { scale } = useSpring({
+    scale: hovered ? 1.4 : 1,
+    config: { tension: 200, friction: 20 },
+  });
+
   const pointsRef = useRef();
+  const navigate = useNavigate();
 
   const { positions, sizes } = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -72,45 +89,71 @@ function LenticularGalaxy({
     return { positions: pos, sizes: sizeArray };
   }, [count, diskRadius, diskThickness, bulgeRadius]);
 
-  // Smooth rotation like a record
+  const handleClick = () => {
+    navigate("/travel");
+  };
+
   useFrame(() => {
-    pointsRef.current.rotation.y += 0.0038;
+    pointsRef.current.rotation.y += 0.0338;
   });
 
   return (
-    <points ref={pointsRef} position={[-30, 0, 40]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={count}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          array={sizes}
-          count={count}
-          itemSize={1}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.025}
-        color={color}
-        sizeAttenuation={false}
-        depthWrite={true}
-        transparent
-        opacity={0.9}
-        blending={1}
-        toneMapped={false}
-      />
-    </points>
+    <>
+      {hovered ? (
+        <GalaxyHoverUI galaxyNAME={"Travel"} cursorPos={cursorPos} />
+      ) : null}
+      <group position={[-30, 0, 40]}>
+        {/* Invisible hitbox sphere - handles all interactions */}
+        <mesh
+          onClick={handleClick}
+          onPointerEnter={() => {
+            isHovered(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => {
+            isHovered(false);
+            document.body.style.cursor = "default";
+          }}
+        >
+          <sphereGeometry args={[diskRadius * 1.2, 32, 32]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+        <animated.points ref={pointsRef} scale={scale}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              array={positions}
+              count={count}
+              itemSize={3}
+            />
+            <bufferAttribute
+              attach="attributes-size"
+              array={sizes}
+              count={count}
+              itemSize={1}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.025}
+            color={color}
+            sizeAttenuation={false}
+            depthWrite={true}
+            transparent
+            opacity={hovered ? 0.9 : 0.2}
+            blending={hovered ? 2 : 1}
+            toneMapped={false}
+          />
+        </animated.points>
+      </group>
+    </>
   );
 }
 
 function EmotionGalaxy({
   count = 20000,
-  mainRadius = 10,
-  blobCount = 3,
+  radius = 10,
+  blobCount = 10,
   color = "#ff66aa",
 }) {
   const [hovered, isHovered] = useState(false);
@@ -140,12 +183,12 @@ function EmotionGalaxy({
       const blobAngle = (blobIndex / blobCount) * Math.PI * 2;
 
       // Offset each blob from center
-      const blobDistance = mainRadius * (0.3 + Math.random() * 0.7);
+      const blobDistance = radius * (0.3 + Math.random() * 0.7);
       const blobCenterX = Math.cos(blobAngle) * blobDistance;
       const blobCenterZ = Math.sin(blobAngle) * blobDistance;
 
       // Random position within blob using exponential distribution
-      const r = Math.pow(Math.random(), 1.5) * mainRadius * 0.6;
+      const r = Math.pow(Math.random(), 1.5) * radius * 0.6;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
 
@@ -169,7 +212,7 @@ function EmotionGalaxy({
     }
 
     return { positions: pos, sizes: sizeArray };
-  }, [count, mainRadius, blobCount]);
+  }, [count, radius, blobCount]);
 
   // Chaotic, multi-axis rotation
   useFrame(({ clock }) => {
@@ -186,47 +229,51 @@ function EmotionGalaxy({
     <>
       {hovered ? (
         <GalaxyHoverUI galaxyNAME={"Emotions"} cursorPos={cursorPos} />
-      ) : null}
-      <animated.points
-        ref={pointsRef}
-        onClick={handleClick}
-        onPointerMove={handlePointerMove}
-        onPointerEnter={() => {
-          isHovered(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerLeave={() => {
-          isHovered(false);
-          document.body.style.cursor = "default";
-        }}
-        scale={scale}
-        position={[-30, 0, -20]}
-      >
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            array={positions}
-            count={count}
-            itemSize={3}
+      ) : null}{" "}
+      <group position={[-30, 0, -20]}>
+        {/* Invisible hitbox sphere - handles all interactions */}
+        <mesh
+          onClick={handleClick}
+          onPointerEnter={() => {
+            isHovered(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => {
+            isHovered(false);
+            document.body.style.cursor = "default";
+          }}
+        >
+          <sphereGeometry args={[radius * 1.2, 32, 32]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+        <animated.points ref={pointsRef} scale={scale}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              array={positions}
+              count={count}
+              itemSize={3}
+            />
+            <bufferAttribute
+              attach="attributes-size"
+              array={sizes}
+              count={count}
+              itemSize={1}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.03}
+            color={color}
+            sizeAttenuation={false}
+            depthWrite={true}
+            transparent
+            opacity={hovered ? 0.85 : 0.2}
+            blending={hovered ? 2 : 1}
+            toneMapped={false}
           />
-          <bufferAttribute
-            attach="attributes-size"
-            array={sizes}
-            count={count}
-            itemSize={1}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.03}
-          color={color}
-          sizeAttenuation={false}
-          depthWrite={true}
-          transparent
-          opacity={hovered ? 0.85 : 0.2}
-          blending={hovered ? 2 : 1}
-          toneMapped={false}
-        />
-      </animated.points>
+        </animated.points>
+      </group>
     </>
   );
 }
@@ -238,7 +285,23 @@ function RingGalaxy({
   ringThickness = 1.5,
   color = "#4488ff",
 }) {
+  const [hovered, isHovered] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
+
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2),
+    });
+  };
+  const { scale } = useSpring({
+    scale: hovered ? 1.4 : 1,
+    config: { tension: 200, friction: 20 },
+  });
+
   const pointsRef = useRef();
+  const navigate = useNavigate();
 
   // Generate ring/hourglass galaxy distribution
   const positions = useMemo(() => {
@@ -303,33 +366,58 @@ function RingGalaxy({
     pointsRef.current.rotation.y += 0.0061;
     pointsRef.current.rotation.x = Math.sin(Date.now() * 0.0001) * 0.1;
   });
-
+  const handleClick = () => {
+    navigate("/personal");
+  };
   return (
-    <points ref={pointsRef} position={[20, 0, -50]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={count}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          array={sizes}
-          count={count}
-          itemSize={1}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.04}
-        color={color}
-        sizeAttenuation={false}
-        depthWrite={true}
-        transparent
-        opacity={0.9}
-        blending={1}
-      />
-    </points>
+    <>
+      {hovered ? (
+        <GalaxyHoverUI galaxyNAME={"Personal"} cursorPos={cursorPos} />
+      ) : null}
+      <group position={[20, 0, -50]}>
+        <mesh
+          onClick={handleClick}
+          onPointerEnter={() => {
+            isHovered(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => {
+            isHovered(false);
+            document.body.style.cursor = "default";
+          }}
+        >
+          <sphereGeometry args={[outerRadius * 1.2, 32, 32]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+        <animated.points ref={pointsRef} scale={scale}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              array={positions}
+              count={count}
+              itemSize={3}
+            />
+            <bufferAttribute
+              attach="attributes-size"
+              array={sizes}
+              count={count}
+              itemSize={1}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.03}
+            color={color}
+            sizeAttenuation={false}
+            depthWrite={true}
+            transparent
+            opacity={hovered ? 0.85 : 0.2}
+            blending={hovered ? 2 : 1}
+            toneMapped={false}
+          />
+        </animated.points>
+      </group>
+    </>
   );
 }
 function EllipticalGalaxy({
@@ -339,21 +427,34 @@ function EllipticalGalaxy({
   radiusZ = 8,
   color = "#ff8844",
 }) {
-  const pointsRef = useRef();
+  const [hovered, isHovered] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
 
-  // Generate elliptical distribution with dense core
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2),
+    });
+  };
+  const { scale } = useSpring({
+    scale: hovered ? 1.4 : 1,
+    config: { tension: 200, friction: 20 },
+  });
+
+  const pointsRef = useRef();
+  const navigate = useNavigate();
+
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      // Use power distribution for denser core
       const r = Math.pow(Math.random(), 0.5);
 
       // Random spherical coordinates
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
 
-      // Elliptical shape with varying radii
       const x = r * radiusX * Math.sin(phi) * Math.cos(theta);
       const y = r * radiusY * Math.sin(phi) * Math.sin(theta);
       const z = r * radiusZ * Math.cos(phi);
@@ -395,84 +496,189 @@ function EllipticalGalaxy({
     pointsRef.current.rotation.x += 0.0003;
     pointsRef.current.rotation.y += 0.0105;
   });
-
+  const handleClick = () => {
+    navigate("/milestones");
+  };
+  console.log(sizes);
   return (
-    <points ref={pointsRef} position={[60, 0, 0]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={count}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          array={sizes}
-          count={count}
-          itemSize={1}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.03}
-        color={color}
-        sizeAttenuation={false}
-        depthWrite={true}
-        transparent
-        opacity={0.8}
-        blending={1}
-      />
-    </points>
+    <>
+      {hovered ? (
+        <GalaxyHoverUI galaxyNAME={"Milestones"} cursorPos={cursorPos} />
+      ) : null}
+      <group position={[60, 0, 0]}>
+        {/* Invisible hitbox sphere - handles all interactions */}
+        <mesh
+          onClick={handleClick}
+          onPointerEnter={() => {
+            isHovered(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => {
+            isHovered(false);
+            document.body.style.cursor = "default";
+          }}
+        >
+          <sphereGeometry args={[radiusX * 1.2, 32, 32]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+
+        {/* Visual galaxy points - no interaction, just visuals */}
+        <animated.points scale={scale} ref={pointsRef}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              array={positions}
+              count={count}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.03}
+            color={color}
+            sizeAttenuation={false}
+            depthWrite={true}
+            transparent
+            opacity={hovered ? 0.85 : 0.2}
+            blending={hovered ? 2 : 1}
+            toneMapped={false}
+          />
+        </animated.points>
+      </group>
+    </>
   );
 }
-function SpiralGalaxy({
+function CareerGalaxy({
   count = 5000,
   radius = 10,
-  rotations = 5,
-  color = "#66ccff",
+  arms = 3,
+  color = "#8200db",
 }) {
-  const pointsRef = useRef();
+  const [hovered, isHovered] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });
 
-  // Generate spiral positions once
+  const handlePointerMove = (e) => {
+    setCursorPos({
+      x: e.point.x.toFixed(2),
+      y: e.point.y.toFixed(2) - 10,
+      z: e.point.z.toFixed(2),
+    });
+  };
+  const { scale } = useSpring({
+    scale: hovered ? 1.4 : 1,
+    config: { tension: 200, friction: 20 },
+  });
+
+  const pointsRef = useRef();
+  const navigate = useNavigate();
+  const coreRef = useRef();
+
+  // Generate multi-arm spiral with density waves and bulge
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
+    const armWidth = 0.4;
+    const bulgeDensity = 0.15; // 15% of stars in bulge
 
     for (let i = 0; i < count; i++) {
-      const t = (i / count) * rotations * Math.PI * 2;
+      const isBulge = Math.random() < bulgeDensity;
 
-      // Spiral formula
-      const r = radius * (i / count);
+      if (isBulge) {
+        // Dense spherical bulge at center
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = Math.pow(Math.random(), 1.5) * radius * 0.25;
 
-      const x = Math.cos(t) * r + (Math.random() - 0.5) * 0.1;
-      const y = (Math.random() - 0.5) * 0.1;
-      const z = Math.sin(t) * r + (Math.random() - 0.5) * 0.1;
+        pos.set(
+          [
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta) * 0.3,
+            r * Math.cos(phi),
+          ],
+          i * 3
+        );
+      } else {
+        // Multiple spiral arms with logarithmic spacing
+        const t = Math.pow(i / count, 0.8) * Math.PI * 3;
+        const armIndex = Math.floor(Math.random() * arms);
+        const armAngle = (armIndex / arms) * Math.PI * 2;
 
-      pos.set([x, y, z], i * 3);
+        const r = radius * Math.pow(i / count, 0.9);
+        const angle = t + armAngle;
+
+        // Logarithmic spiral with density variations
+        const x =
+          Math.cos(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
+        const y = (Math.random() - 0.5) * Math.exp(-r / radius) * 0.4;
+        const z =
+          Math.sin(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
+
+        pos.set([x, y, z], i * 3);
+      }
     }
 
     return pos;
-  }, [count, radius, rotations]);
+  }, [count, radius, arms]);
+  const handleClick = () => {
+    navigate("/career");
+  };
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime();
 
-  useFrame(() => {
-    pointsRef.current.rotation.y += 0.0058;
+    // Differential rotation (inner parts rotate faster)
+    pointsRef.current.rotation.y = time * 1.22;
+
+    // Counter-rotating core
+    if (coreRef.current) {
+      coreRef.current.rotation.y = -time * 0.05;
+    }
   });
 
   return (
-    <points ref={pointsRef} position={[30, 0, 50]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={count}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.02}
-        color={color}
-        sizeAttenuation={false}
-        depthWrite={true}
-      />
-    </points>
+    <>
+      {hovered ? (
+        <GalaxyHoverUI cursorPos={cursorPos} galaxyNAME={"Career"} />
+      ) : null}
+      <group position={[30, 0, 50]}>
+        {/* Invisible hitbox sphere - handles all interactions */}
+        <mesh
+          onClick={handleClick}
+          onPointerEnter={() => {
+            isHovered(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => {
+            isHovered(false);
+            document.body.style.cursor = "default";
+          }}
+        >
+          <sphereGeometry args={[radius * 1.2, 32, 32]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+
+        {/* Visual galaxy points - no interaction, just visuals */}
+        <animated.points scale={scale} ref={pointsRef}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              array={positions}
+              count={count}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.03}
+            color={color}
+            sizeAttenuation={false}
+            depthWrite={true}
+            transparent
+            opacity={hovered ? 0.85 : 0.2}
+            blending={hovered ? 2 : 1}
+            toneMapped={false}
+          />
+        </animated.points>
+      </group>
+    </>
   );
 }
 
@@ -507,11 +713,11 @@ function Scence() {
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <Stars />
 
-        <SpiralGalaxy />
+        <CareerGalaxy />
         <EllipticalGalaxy />
         <RingGalaxy />
         <EmotionGalaxy />
-        <LenticularGalaxy />
+        <TravelGalaxy />
         <OrbitControls
           enablePan={false}
           enableZoom={true}
@@ -525,44 +731,25 @@ function Scence() {
           }}
         />
       </Canvas>
-      <ul className="flex gap-[10rem] absolute flex-col left-10  top-75  rounded-2xl p-[1rem]">
-        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer   justify-center">
-          <div className="bg-emotion w-[1.25rem] h-[1.25rem] rounded-full"></div>
-          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
-            {" "}
-            EMOTIONS
-          </span>
-        </li>
-        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
-          <div className="bg-green-600 w-[1.25rem] h-[1.25rem] rounded-full"></div>
-          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
-            {" "}
-            TRAVEL
-          </span>
-        </li>
-        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
-          <div className="bg-blue-700 w-[1.25rem] h-[1.25rem] rounded-full"></div>
-          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
-            {" "}
-            CAREER
-          </span>
-        </li>
-        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
-          <div className="bg-amber-500 w-[1.25rem] h-[1.25rem] rounded-full"></div>
-          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
-            {" "}
-            PERSONAL
-          </span>
-        </li>
-        <li className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer  justify-center">
-          <div className="bg-purple-500 w-[1.25rem] h-[1.25rem] rounded-full"></div>
-          <span className="text-[1.2rem] tracking-[0.4rem] group-hover:text-tertiary transition-all  group-hover:text-[1.6rem]">
-            {" "}
-            MILESTONES
-          </span>
-        </li>
+      <ul className="flex gap-[10rem]  absolute flex-col left-10  top-75  rounded-2xl p-[1rem]">
+        {sideBar.map((item) => {
+          return (
+            <li
+              key={item}
+              className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer   justify-center"
+            >
+              <div
+                className={`bg-${item} w-[1.25rem] h-[1.25rem] rounded-full`}
+              ></div>
+              <span className="text-[1.2rem] tracking-[0.4rem] uppercase group-hover:text-tertiary transition-all  group-hover:text-[1.6rem] ">
+                {item}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
 }
+
 export default Scence;
