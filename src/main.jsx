@@ -15,7 +15,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/Emotions",
+    path: "/Emotion",
     element: <SpiralPlanets />,
   },
 ]);

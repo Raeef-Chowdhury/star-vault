@@ -8,6 +8,7 @@ import { useSpring, animated } from "@react-spring/three";
 import Stars from "../Stars";
 import ConnectionLines from "./ConnectionLines";
 import Header from "./header";
+import SideBar from "./SideBar";
 const spheresData = [
   { position: [-15, 0, 2], color: "#ef4444" },
   { position: [-10, 0, 1], color: "#22c55e" },
@@ -59,6 +60,7 @@ function SpiralPlanets() {
         <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
           EMOTIONS
         </p>
+        <SideBar />
         <Canvas
           camera={{ position: [-30, 24, 1.2], fov: 100 }}
           style={{

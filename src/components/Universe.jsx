@@ -12,7 +12,7 @@ import { useSpring } from "@react-spring/three";
 import { animated } from "@react-spring/three";
 import Stars from "../Stars";
 import GalaxyHoverUI from "./GalaxyHoverUI";
-const sideBar = ["emotion", "travel", "career", "personal", "milestones"];
+import SideBar from "./SideBar";
 function TravelGalaxy({
   count = 15000,
   diskRadius = 10,
@@ -223,7 +223,7 @@ function EmotionGalaxy({
   });
 
   const handleClick = () => {
-    navigate("/emotions");
+    navigate("/emotion");
   };
   return (
     <>
@@ -420,7 +420,7 @@ function RingGalaxy({
     </>
   );
 }
-function EllipticalGalaxy({
+function MilestoneGalaxy({
   count = 8000,
   radiusX = 8,
   radiusY = 5,
@@ -697,10 +697,11 @@ function CareerGalaxy({
 // }
 function Scence() {
   return (
-    <div className="h-[100vh] w-[100vw] relative bg-black">
+    <div className="relative h-[100vh] w-[100vw] relative bg-black">
       <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
         UNIVERSE
       </p>
+      <SideBar />
       <Canvas
         camera={{ position: [-30, 24, 1.2], fov: 100 }}
         style={{
@@ -714,7 +715,7 @@ function Scence() {
         <Stars />
 
         <CareerGalaxy />
-        <EllipticalGalaxy />
+        <MilestoneGalaxy />
         <RingGalaxy />
         <EmotionGalaxy />
         <TravelGalaxy />
@@ -731,23 +732,6 @@ function Scence() {
           }}
         />
       </Canvas>
-      <ul className="flex gap-[10rem]  absolute flex-col left-10  top-75  rounded-2xl p-[1rem]">
-        {sideBar.map((item) => {
-          return (
-            <li
-              key={item}
-              className="flex flex-col gap-[1.2rem] items-center group  transition-all hover:cursor-pointer   justify-center"
-            >
-              <div
-                className={`bg-${item} w-[1.25rem] h-[1.25rem] rounded-full`}
-              ></div>
-              <span className="text-[1.2rem] tracking-[0.4rem] uppercase group-hover:text-tertiary transition-all  group-hover:text-[1.6rem] ">
-                {item}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
     </div>
   );
 }
