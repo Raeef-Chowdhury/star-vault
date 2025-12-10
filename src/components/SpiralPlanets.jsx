@@ -5,10 +5,12 @@ import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useSpring, animated } from "@react-spring/three";
+import { motion } from "motion/react";
 import Stars from "../Stars";
 import ConnectionLines from "./ConnectionLines";
 import Header from "./header";
 import SideBar from "./SideBar";
+import BackButton from "./BackButton";
 const spheresData = [
   { position: [-15, 0, 2], color: "#ef4444" },
   { position: [-10, 0, 1], color: "#22c55e" },
@@ -56,9 +58,14 @@ function SpiralPlanets() {
   return (
     <>
       <Header />
-      <div className="h-[100vh] w-[100vw] relative bg-black">
-        <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          EMOTIONS
+      <motion.div
+        initial={{ opacity: 0, translateX: "-100%" }}
+        animate={{ opacity: 1, translateX: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="h-[100vh] w-[100vw] relative bg-black"
+      >
+        <p className="text-emotion text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+          EMOTIONS GALAXY
         </p>
         <SideBar />
         <Canvas
@@ -92,9 +99,10 @@ function SpiralPlanets() {
           />
         </Canvas>
         <p className="text-gray-200 opacity-40 text-[2.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[1rem] ">
-          Select a Galaxy to Explore
+          Select a Memory (Planet) to Explore
         </p>
-      </div>
+        <BackButton />
+      </motion.div>
     </>
   );
 }

@@ -14,7 +14,7 @@ function SideBar() {
   const navigate = useNavigate();
   return (
     <ul
-      className={`transform  translate-y-[25%] z-50 flex gap-[10rem]  absolute flex-col rounded-2xl `}
+      className={`transform  translate-y-[25%] z-2 flex gap-[10rem]  absolute flex-col rounded-2xl `}
     >
       {sideBar.map((item) => {
         const isActive = location.pathname === `/${item}`;

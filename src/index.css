@@ -16,7 +16,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 body {
-  background-color: #0a0e1a;
+  background-color: #000;
   padding-bottom: 16rem;
   scroll-behaviour: smooth;
 }

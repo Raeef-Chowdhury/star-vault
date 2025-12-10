@@ -2,8 +2,7 @@ import "./App.css";
 import Header from "./components/header";
 import Scence from "./components/Universe";
 
-//TODO: ADD GALAXiES HOVERING EFFECT & BOTTOM CATEOGRY LIST
-//TODO: Unique Galaxies UI (SPiral,GLow,Black Hole,Ring,etc..)
+//TODO: Replace Add galaxy with "what is it? modal on click explannatio of app"
 //TODO: ADD GAALXY/MEMORY UI form in header
 //TODO: INDIVIDUAL STARS IN GALAXY
 //TODO: REACT ROUTING EACH IDNIVIDUAL GALAXY
