@@ -14,7 +14,12 @@ function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25 }}
-            className="fixed top-0 left-0 w-screen h-screen flex items-center  justify-center z-50 bg-slate-900/90"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setModal(false);
+              }
+            }}
+            className="fixed top-0 left-0 w-screen h-screen flex items-center  justify-center z-50 bg-slate-950/90"
           >
             <div className=" relative w-full max-w-[1440px] rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-10 shadow-2xl border border-slate-700">
               <div className="space-y-8">
@@ -23,15 +28,13 @@ function Header() {
                     <span className="text-[3.6rem]">✨</span> What is Star
                     Vault?
                   </h3>
-                  <div className="space-y-4 text-[1.6rem] p-[1rem] max-w-[960px] justify-self-center text-slate-300 leading-relaxed">
+                  <div className="space-y-4 text-[1.6rem] p-[1rem] max-w-[644px] justify-self-center text-slate-300 leading-relaxed">
                     <p>
-                      Star Vault is a personal universe designed to visualize
-                      your thoughts as stars scattered across a calm, open
-                      space. Instead of viewing memories, ideas, or notes as
-                      plain lists, Star Vault turns them into a constellation
-                      you can freely explore. This helps you think in a more
-                      visual, intuitive way, making your inner world feel
-                      organized rather than overwhelming.
+                      Star Vault is your own unique journal of ideas and
+                      memories represented through planets and galaxies. These
+                      memroies are represented by planets while each of the 5
+                      dsitinct galaxies represent a core category on their own.
+                      You can always add or remove memories as you please.
                     </p>
                     <p>
                       Each star represents a piece of information youve added —
