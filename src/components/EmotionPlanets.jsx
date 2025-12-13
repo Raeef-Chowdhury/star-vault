@@ -12,10 +12,106 @@ import ConnectionLines from "./ConnectionLines";
 import Header from "./header";
 import SideBar from "./SideBar";
 import BackButton from "./BackButton";
+function randomPosition(center = [0, 0, 0], minRadius = 10, maxRadius = 30) {
+  // Stars will be placed minRadius to maxRadius units away from galaxy center
+  const r = minRadius + Math.random() * (maxRadius - minRadius);
+
+  // Random angle for flat horizontal distribution (x-z plane only)
+  const theta = Math.random() * Math.PI * 2; // horizontal angle (0 to 2π)
+
+  // Spread in all quadrants around the galaxy center
+  const x = center[0] + r * Math.cos(theta);
+  const y = center[1]; // No vertical variation
+  const z = center[2] + r * Math.sin(theta);
+
+  return [x, y, z];
+}
+function randomStarColor() {
+  // Generates a random hex color
+  const letters = "01234567ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 10)];
+  }
+  return color;
+}
+
+export const galaxies = [
+  {
+    id: "personal",
+    name: "Personal",
+    color: "#ef4444",
+    position: [-15, 0, 2],
+    stars: Array.from({ length: 5 }).map((_, i) => ({
+      id: `personal_mem_${i + 1}`,
+      title: `Personal Memory ${i + 1}`,
+      description: `This is sample Personal memory #${i + 1}.`,
+      date: `2025-12-${i + 1 < 10 ? "0" : ""}${i + 1}`,
+      position: randomPosition([-15, 0, 2], 3),
+      color: randomStarColor(),
+    })),
+  },
+  {
+    id: "career",
+    name: "Career",
+    color: "#22c55e",
+    position: [-10, 0, 1],
+    stars: Array.from({ length: 5 }).map((_, i) => ({
+      id: `career_mem_${i + 1}`,
+      title: `Career Memory ${i + 1}`,
+      description: `This is sample Career memory #${i + 1}.`,
+      date: `2025-11-${i + 10}`,
+      position: randomPosition([-10, 0, 1], 3),
+      color: randomStarColor(),
+    })),
+  },
+  {
+    id: "milestone",
+    name: "Milestone",
+    color: "#3b82f6",
+    position: [-5, 0, 4],
+    stars: Array.from({ length: 5 }).map((_, i) => ({
+      id: `milestone_mem_${i + 1}`,
+      title: `Milestone Memory ${i + 1}`,
+      description: `This is sample Milestone memory #${i + 1}.`,
+      date: `2025-10-${i + 15}`,
+      position: randomPosition([-5, 0, 4], 3),
+      color: randomStarColor(),
+    })),
+  },
+  {
+    id: "emotion",
+    name: "Emotion",
+    color: "#eab308",
+    position: [5, 0, 6],
+    stars: Array.from({ length: 5 }).map((_, i) => ({
+      id: `emotion_mem_${i + 1}`,
+      title: `Emotion Memory ${i + 1}`,
+      description: `This is sample Emotion memory #${i + 1}.`,
+      date: `2025-09-${i + 20}`,
+      position: randomPosition([0, 0, 0], 20),
+      color: randomStarColor(),
+    })),
+  },
+  {
+    id: "travel",
+    name: "Travel",
+    color: "#a855f7",
+    position: [10.5, 0, 7],
+    stars: Array.from({ length: 5 }).map((_, i) => ({
+      id: `travel_mem_${i + 1}`,
+      title: `Travel Memory ${i + 1}`,
+      description: `This is sample Travel memory #${i + 1}.`,
+      date: `2025-08-${i + 25}`,
+      position: randomPosition([10.5, 0, 7], 3),
+      color: randomStarColor(),
+    })),
+  },
+];
 
 function EmotionGalaxy({
-  count = 20000,
-  radius = 10,
+  count = 6000,
+  radius = 3,
   blobCount = 10,
   color = "#ff66aa",
   cameraPos,
@@ -122,15 +218,6 @@ function EmotionGalaxy({
   );
 }
 
-const spheresData = [
-  { position: [-15, 0, 2], color: "#ef4444" },
-  { position: [-10, 0, 1], color: "#22c55e" },
-  { position: [-5, 0, 4], color: "#3b82f6" },
-  { position: [5, 0, 6], color: "#eab308" },
-  { position: [10.5, 0, 7], color: "#a855f7" },
-  { position: [15, 0, 20], color: "#06b6d4" },
-];
-
 function Sphere({ position, color }) {
   const [hovered, isHovered] = useState(false);
   const { scale } = useSpring({
@@ -142,9 +229,11 @@ function Sphere({ position, color }) {
       position={position}
       onPointerEnter={() => {
         isHovered(true);
+        document.body.style.cursor = "pointer";
       }}
       onPointerOut={() => {
         isHovered(false);
+        document.body.style.cursor = "default";
       }}
     >
       <mesh>
@@ -166,6 +255,8 @@ function Sphere({ position, color }) {
 }
 
 function EmotionPlanets() {
+  const emotionPlanets = galaxies.find((galaxy) => galaxy.name == "Emotion");
+  console.log(emotionPlanets);
   return (
     <>
       <Header />
@@ -190,14 +281,13 @@ function EmotionPlanets() {
           {/* <CameraLogger /> */}
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines />
+          <ConnectionLines planetPositions={emotionPlanets.stars} />
           <Stars />
           <EmotionGalaxy cameraPos={[0, 0, 0]} />
-
-          {spheresData.map((sphere, idx) => (
-            <Sphere key={idx} {...sphere} />
+          {emotionPlanets.stars.map((star, i) => (
+            <Sphere key={i} position={star.position} color={star.color} />
           ))}
-
+          {console.log(emotionPlanets)}
           <OrbitControls
             enablePan={true}
             enableZoom={true}

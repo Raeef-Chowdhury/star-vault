@@ -199,7 +199,7 @@ function AddModalContent({ setModal }) {
         <div className="space-y-6 text-[1.6rem] p-8 rounded-2xl bg-slate-800/30 backdrop-blur-sm">
           <div className="flex justify-between ">
             <p className="text-[4.8rem] text-text tracking-[0.2rem] w-fit mx-auto mb-4 font-light">
-              EMOTION INTENSITY
+              IMPORTANCE
             </p>
             <p>Intensity/5</p>
           </div>
@@ -218,7 +218,7 @@ function AddModalContent({ setModal }) {
             <div className="flex justify-between text-[1.8rem] text-slate-400 px-2"></div>
           </div>
         </div>
-        <div className="pt-8 pb-4">
+        <div className="pt-8 pb-4 mt-[4.8rem]">
           <button
             type="submit"
             className="mx-auto block bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[2.8rem] font-semibold px-[4.8rem] py-[1.2rem] rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
