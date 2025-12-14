@@ -13,21 +13,43 @@ import Header from "./header";
 import SideBar from "./SideBar";
 import BackButton from "./BackButton";
 import { Html } from "@react-three/drei";
+// Seeded random number generator for consistent results
+function seededRandom(seed) {
+  let x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
 
-function randomPosition(center = [0, 0, 0], minRadius = 10, maxRadius = 30) {
-  const r = minRadius + Math.random() * (maxRadius - minRadius);
-  const theta = Math.random() * Math.PI * 2;
-  const x = center[0] + r * Math.cos(theta);
-  const y = center[1];
-  const z = center[2] + r * Math.sin(theta);
+function randomPosition(
+  seed,
+  center = [0, 0, 0],
+  minRadius = 16,
+  maxRadius = 120
+) {
+  let x, y, z, distFromOrigin;
+  let attempts = 0;
+
+  do {
+    const r =
+      minRadius + seededRandom(seed + attempts) * (maxRadius - minRadius);
+    const theta = seededRandom(seed + attempts + 1) * Math.PI * 2;
+
+    // Flat circular distribution on XZ plane (no Y change)
+    x = center[0] + r * Math.cos(theta);
+    y = center[1]; // Keep Y constant at center's Y
+    z = center[2] + r * Math.sin(theta);
+
+    distFromOrigin = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
+    attempts++;
+  } while (distFromOrigin < 4 && attempts < 100); // Reduced to 4 to avoid EmotionGalaxy (radius 3)
+
   return [x, y, z];
 }
 
-function randomStarColor() {
-  const letters = "01234567ABCDEF";
+function randomStarColor(seed) {
+  const letters = "4356789ABCDEF";
   let color = "#";
   for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 10)];
+    color += letters[Math.floor(seededRandom(seed + i) * letters.length)];
   }
   return color;
 }
@@ -43,8 +65,8 @@ export const galaxies = [
       title: `Personal Memory ${i + 1}`,
       description: `This is sample Personal memory #${i + 1}.`,
       date: `2025-12-${i + 1 < 10 ? "0" : ""}${i + 1}`,
-      position: randomPosition([-15, 0, 2], 3),
-      color: randomStarColor(),
+      position: randomPosition(1000 + i, [-15, 0, 2], 6, 12),
+      color: randomStarColor(1000 + i),
     })),
   },
   {
@@ -57,8 +79,8 @@ export const galaxies = [
       title: `Career Memory ${i + 1}`,
       description: `This is sample Career memory #${i + 1}.`,
       date: `2025-11-${i + 10}`,
-      position: randomPosition([-10, 0, 1], 3),
-      color: randomStarColor(),
+      position: randomPosition(2000 + i, [-10, 0, 1], 6, 12),
+      color: randomStarColor(2000 + i),
     })),
   },
   {
@@ -71,8 +93,8 @@ export const galaxies = [
       title: `Milestone Memory ${i + 1}`,
       description: `This is sample Milestone memory #${i + 1}.`,
       date: `2025-10-${i + 15}`,
-      position: randomPosition([-5, 0, 4], 3),
-      color: randomStarColor(),
+      position: randomPosition(3000 + i, [-5, 0, 4], 6, 12),
+      color: randomStarColor(3000 + i),
     })),
   },
   {
@@ -85,8 +107,8 @@ export const galaxies = [
       title: `Emotion Memory ${i + 1}`,
       description: `This is sample Emotion memory #${i + 1}.`,
       date: `2025-09-${i + 20}`,
-      position: randomPosition([0, 0, 0], 20),
-      color: randomStarColor(),
+      position: randomPosition(4000 + i * 50, [0, 0, 0], 10, 20),
+      color: randomStarColor(4000 + i),
     })),
   },
   {
@@ -99,8 +121,8 @@ export const galaxies = [
       title: `Travel Memory ${i + 1}`,
       description: `This is sample Travel memory #${i + 1}.`,
       date: `2025-08-${i + 25}`,
-      position: randomPosition([10.5, 0, 7], 3),
-      color: randomStarColor(),
+      position: randomPosition(5000 + i, [10.5, 0, 7], 6, 12),
+      color: randomStarColor(5000 + i),
     })),
   },
 ];
