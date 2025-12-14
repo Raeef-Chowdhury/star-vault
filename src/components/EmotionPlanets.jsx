@@ -103,6 +103,7 @@ export const galaxies = [
     color: "#eab308",
     position: [5, 0, 6],
     stars: Array.from({ length: 5 }).map((_, i) => ({
+      galaxy: "emotion",
       id: `emotion_mem_${i + 1}`,
       title: `Emotion Memory ${i + 1}`,
       description: `This is sample Emotion memory #${i + 1}.`,
@@ -214,7 +215,7 @@ function EmotionGalaxy({
     </>
   );
 }
-function Modal({ onClose, sphereData, starId }) {
+function Modal({ onClose, sphereData }) {
   return (
     <Html
       fullscreen
@@ -234,7 +235,7 @@ function Modal({ onClose, sphereData, starId }) {
         />
 
         {/* Modal Content */}
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen flex items-center justify-center z-[9999] p-5 pointer-events-none">
+        <div className="fixed top-1/2 left-1/2 max-w-[788px] -translate-x-1/2 -translate-y-1/2 w-screen h-screen flex items-center justify-center z-[9999] p-5 pointer-events-none">
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -251,44 +252,68 @@ function Modal({ onClose, sphereData, starId }) {
           >
             <div className="relative w-full rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-10 shadow-2xl border border-slate-700">
               <div className="space-y-8">
-                <div className="rounded-lg mx-auto bg-slate-800/60 text-center backdrop-blur p-6 md:p-8 shadow-lg border border-slate-700/50">
-                  <h3 className="text-3xl md:text-5xl lg:text-[4.8rem] mb-6 md:mb-8 lg:mb-[2.4rem] font-semibold text-blue-300 flex items-center gap-2 justify-center flex-wrap">
-                    <span className="text-3xl md:text-4xl lg:text-[3.6rem]">
-                      ✨
+                <div className="rounded-lg mx-auto  text-center backdrop-blur p-6 md:p-8 ">
+                  <h3 className="text-[7.2rem] md:text-5xl lg:text-[4.8rem] mb-6 md:mb-8 lg:mb-[2.4rem] font-semibold text-primary flex items-center gap-2 justify-center flex-wrap">
+                    <span className="text-[4.8rem] mb-[4.8rem]">
+                      {sphereData?.title || "Memory Details"}
                     </span>
-                    <span>{sphereData?.title || "Memory Details"}</span>
                   </h3>
-                  <div className="space-y-4 text-sm md:text-base lg:text-[1.6rem] p-3 md:p-4 lg:p-[1rem] max-w-[644px] mx-auto text-slate-300 leading-relaxed">
-                    <p>
+                  <div className="flex justify-center items-center gap-6 flex-wrap">
+                    <div className="flex items-center gap-3 bg-secondary/30 backdrop-blur-sm px-6 py-3 rounded-full border border-primary/20">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-primary"
+                      >
+                        <rect
+                          x="3"
+                          y="4"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      <span className="text-text text-[1.8rem] font-medium">
+                        {sphereData?.date &&
+                          new Date(sphereData.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+                      </span>
+                    </div>
+
+                    <div
+                      className={` bg-${sphereData?.galaxy}/20 backdrop-blur-sm px-6 py-3 rounded-full border border-${sphereData?.galaxy}/40`}
+                    >
+                      <span
+                        className={`text-${sphereData?.galaxy} text-[1.8rem] font-semibold uppercase tracking-wider`}
+                      >
+                        {sphereData?.galaxy || "Emotion"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-4 text-sm md:text-base lg:text-[1.6rem] p-3 md:p-4 lg:p-[1rem] max-w-[644px] mx-auto mt-[4rem] text-text  leading-relaxed">
+                    <p className="text-[2.4rem]">
                       {sphereData?.description ||
                         "This is your memory sphere. Click to explore."}
                     </p>
-                    {sphereData?.date && (
-                      <p className="text-xs md:text-sm text-slate-400 mt-4">
-                        Date: {sphereData.date}
-                      </p>
-                    )}
-                    <p className="text-xs md:text-sm text-slate-400">
-                      Memory ID: {starId}
-                    </p>
                   </div>
                 </div>
-
-                <div className="rounded-lg mx-auto px-4 md:px-6 lg:px-[4rem] bg-indigo-950/40 backdrop-blur p-4 md:p-6 border border-indigo-800/30 shadow-lg">
-                  <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-4">
-                    <span className="text-3xl md:text-4xl flex-shrink-0 leading-none">
-                      💡
-                    </span>
-                    <p className="text-center md:text-left text-indigo-200 font-medium text-sm md:text-base lg:text-[1.65rem]">
-                      <strong className="text-indigo-100 text-lg md:text-xl lg:text-[2.4rem]">
-                        Quick Tip:
-                      </strong>{" "}
-                      Click anywhere outside this modal or press the X button to
-                      close and continue exploring the 3D space.
-                    </p>
-                  </div>
-                </div>
-
                 <button
                   onClick={onClose}
                   style={{
