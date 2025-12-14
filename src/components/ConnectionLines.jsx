@@ -33,34 +33,4 @@ function ConnectionLines({ planetPositions }) {
   );
 }
 
-// Alternative: Connect all stars to a central point
-function ConnectionLinesRadial({ planetPositions, center = [0, 0, 0] }) {
-  const linesRef = useRef();
-
-  const linePositions = React.useMemo(() => {
-    const positions = [];
-
-    // Connect each star to the center point
-    planetPositions.forEach((star) => {
-      positions.push(...center);
-      positions.push(...star.position);
-    });
-
-    return new Float32Array(positions);
-  }, [planetPositions, center]);
-
-  return (
-    <lineSegments ref={linesRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={linePositions.length / 3}
-          array={linePositions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial color="#ffffff" opacity={0.2} transparent />
-    </lineSegments>
-  );
-}
 export default ConnectionLines;
