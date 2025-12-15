@@ -18,15 +18,30 @@ function seededRandom(seed) {
   let x = Math.sin(seed++) * 10000;
   return x - Math.floor(x);
 }
+function distance3D(pos1, pos2) {
+  return Math.sqrt(
+    Math.pow(pos1[0] - pos2[0], 2) +
+      Math.pow(pos1[1] - pos2[1], 2) +
+      Math.pow(pos1[2] - pos2[2], 2)
+  );
+}
+
+// Check if position is valid (maintains minimum gap from all existing positions)
+function isValidPosition(newPos, existingPositions, minGap) {
+  return existingPositions.every((pos) => distance3D(newPos, pos) >= minGap);
+}
 
 function randomPosition(
   seed,
   center = [0, 0, 0],
   minRadius = 16,
-  maxRadius = 120
+  maxRadius = 120,
+  existingPositions = [],
+  minGap = 2.5 // Minimum distance between stars
 ) {
   let x, y, z, distFromOrigin;
   let attempts = 0;
+  const maxAttempts = 500; // Increase max attempts for better placement
 
   do {
     const r =
@@ -38,13 +53,24 @@ function randomPosition(
     y = center[1]; // Keep Y constant at center's Y
     z = center[2] + r * Math.sin(theta);
 
+    const newPos = [x, y, z];
     distFromOrigin = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
-    attempts++;
-  } while (distFromOrigin < 4 && attempts < 100); // Reduced to 4 to avoid EmotionGalaxy (radius 3)
 
+    // Check if position is valid (far enough from origin and other stars)
+    if (
+      distFromOrigin >= 4 &&
+      isValidPosition(newPos, existingPositions, minGap)
+    ) {
+      return newPos;
+    }
+
+    attempts++;
+  } while (attempts < maxAttempts);
+
+  // If we couldn't find a valid position, return the last attempt
+  console.warn(`Could not find valid position after ${maxAttempts} attempts`);
   return [x, y, z];
 }
-
 function randomStarColor(seed) {
   const letters = "4356789ABCDEF";
   let color = "#";
@@ -102,15 +128,31 @@ export const galaxies = [
     name: "Emotion",
     color: "#eab308",
     position: [5, 0, 6],
-    stars: Array.from({ length: 5 }).map((_, i) => ({
-      galaxy: "emotion",
-      id: `emotion_mem_${i + 1}`,
-      title: `Emotion Memory ${i + 1}`,
-      description: `This is sample Emotion memory #${i + 1}.`,
-      date: `2025-09-${i + 20}`,
-      position: randomPosition(4000 + i * 50, [0, 0, 0], 10, 20),
-      color: randomStarColor(4000 + i),
-    })),
+    stars: (() => {
+      const stars = [];
+      const positions = [];
+      for (let i = 0; i < 5; i++) {
+        const pos = randomPosition(
+          4000 + i * 50,
+          [0, 0, 0],
+          10,
+          25,
+          positions,
+          2.5
+        );
+        positions.push(pos);
+        stars.push({
+          galaxy: "emotion",
+          id: `emotion_mem_${i + 1}`,
+          title: `Emotion Memory ${i + 1}`,
+          description: `This is sample Emotion memory #${i + 1}.`,
+          date: `2025-09-${i + 20}`,
+          position: pos,
+          color: randomStarColor(4000 + i),
+        });
+      }
+      return stars;
+    })(),
   },
   {
     id: "travel",
@@ -298,7 +340,7 @@ function Modal({ onClose, sphereData }) {
                     </div>
 
                     <div
-                      className={` bg-${sphereData?.galaxy}/20 backdrop-blur-sm px-6 py-3 rounded-full border border-${sphereData?.galaxy}/40`}
+                      className={` bg-${sphereData?.galaxy}/20 backdrop-blur-sm px-6 py-3 rounded-full border border-emotion/40`}
                     >
                       <span
                         className={`text-${sphereData?.galaxy} text-[1.8rem] font-semibold uppercase tracking-wider`}
