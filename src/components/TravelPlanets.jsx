@@ -1,27 +1,28 @@
-/* eslint-disable react/jsx-key */
-/* eslint-disable no-undef */
-/* eslint-disable react/no-unknown-property */
 /* eslint-disable react/prop-types */
-import { useState, useRef, useMemo } from "react";
+/* eslint-disable react/no-unknown-property */
+import Header from "./header";
 import { Canvas } from "@react-three/fiber";
-import { useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/three";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import Stars from "../Stars";
 import ConnectionLines from "./ConnectionLines";
-import Header from "./header";
 import SideBar from "./SideBar";
-import BackButton from "./BackButton";
-import { Html } from "@react-three/drei";
 import { galaxies } from "./Data";
-// Seeded random number generator for consistent results
-
-function EmotionGalaxy({
-  count = 6000,
+import BackButton from "./BackButton";
+import { useMemo, useRef } from "react";
+import { useSpring } from "@react-spring/three";
+import { useFrame } from "@react-three/fiber";
+import { animated } from "@react-spring/three";
+import { Html } from "@react-three/drei";
+import { useState } from "react";
+import { AnimatePresence } from "motion/react";
+function TravelGalaxy({
+  count = 15000,
+  diskRadius = 10,
+  diskThickness = 0.8,
+  bulgeRadius = 3,
+  color = "#497d00",
   radius = 3,
-  blobCount = 10,
-  color = "#ff66aa",
   cameraPos,
 }) {
   const { scale } = useSpring({
@@ -33,38 +34,55 @@ function EmotionGalaxy({
     const pos = new Float32Array(count * 3);
     const sizeArray = new Float32Array(count);
 
-    for (let i = 0; i < count; i++) {
-      const blobIndex = Math.floor(Math.random() * blobCount);
-      const blobAngle = (blobIndex / blobCount) * Math.PI * 2;
-      const blobDistance = radius * (0.3 + Math.random() * 0.7);
-      const blobCenterX = Math.cos(blobAngle) * blobDistance;
-      const blobCenterZ = Math.sin(blobAngle) * blobDistance;
-      const r = Math.pow(Math.random(), 1.5) * radius * 0.6;
+    // Split between bulge and disk
+    const bulgeCount = Math.floor(count * 0.4); // 40% in central bulge
+    const diskCount = count - bulgeCount;
+
+    let idx = 0;
+
+    // Create bright central bulge (spherical)
+    for (let i = 0; i < bulgeCount; i++) {
+      const r = Math.pow(Math.random(), 0.7) * bulgeRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const x = blobCenterX + r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta) * 0.4;
-      const z = blobCenterZ + r * Math.cos(phi);
-      const scatter = 1.5;
-      pos.set(
-        [
-          x + (Math.random() - 0.5) * scatter,
-          y + (Math.random() - 0.5) * scatter * 0.5,
-          z + (Math.random() - 0.5) * scatter,
-        ],
-        i * 3
-      );
-      sizeArray[i] = 0.015 + Math.random() * 0.04;
+
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta) * 0.7; // Slightly flattened
+      const z = r * Math.cos(phi);
+
+      pos.set([x, y, z], idx * 3);
+
+      // Brighter stars in bulge
+      sizeArray[idx] = 0.04 + Math.random() * 0.03;
+      idx++;
+    }
+
+    // Create smooth disk with NO spiral arms
+    for (let i = 0; i < diskCount; i++) {
+      // Exponential distribution for realistic disk
+      const r =
+        bulgeRadius + Math.pow(Math.random(), 0.5) * (diskRadius - bulgeRadius);
+      const theta = Math.random() * Math.PI * 2;
+
+      const x = r * Math.cos(theta);
+      const z = r * Math.sin(theta);
+
+      // Very thin disk with slight variation
+      const y =
+        (Math.random() - 0.5) * diskThickness * Math.exp(-r / diskRadius);
+
+      pos.set([x, y, z], idx * 3);
+
+      // Dimmer stars in outer disk
+      sizeArray[idx] = 0.015 * (1 - (r / diskRadius) * 0.5);
+      idx++;
     }
 
     return { positions: pos, sizes: sizeArray };
-  }, [count, radius, blobCount]);
+  }, [count, diskRadius, diskThickness, bulgeRadius]);
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    pointsRef.current.rotation.x = Math.sin(t * 0.1) * 0.2;
-    pointsRef.current.rotation.y += 0.0304;
-    pointsRef.current.rotation.z = Math.cos(t * 0.15) * 0.1;
+  useFrame(() => {
+    pointsRef.current.rotation.y += 0.0338;
   });
 
   return (
@@ -187,7 +205,7 @@ function Modal({ onClose, sphereData }) {
                     </div>
 
                     <div
-                      className={` bg-${sphereData?.galaxy}/20 backdrop-blur-sm px-6 py-3 rounded-full border border-emotion/40`}
+                      className={` bg-background bg-opacity-30 backdrop-blur-sm px-6 py-3 rounded-full border border-amber`}
                     >
                       <span
                         className={`text-${sphereData?.galaxy} text-[1.8rem] font-semibold uppercase tracking-wider`}
@@ -250,6 +268,7 @@ function Modal({ onClose, sphereData }) {
 
                   return (
                     <svg
+                      key={4}
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
@@ -322,10 +341,8 @@ function Sphere({ position, color, starData }) {
     </>
   );
 }
-
-function EmotionPlanets() {
-  const emotionPlanets = galaxies.find((galaxy) => galaxy.name == "Emotion");
-
+function TravelPlanets() {
+  const travelPlanets = galaxies.find((galaxy) => galaxy.name == "Travel");
   return (
     <>
       <Header />
@@ -336,8 +353,8 @@ function EmotionPlanets() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="h-[100vh] w-[100vw] relative bg-black"
       >
-        <p className="text-emotion text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          EMOTION PLANETS
+        <p className="text-travel text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+          TRAVEL PLANETS
         </p>
         <SideBar />
         <Canvas
@@ -349,10 +366,10 @@ function EmotionPlanets() {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines planetPositions={emotionPlanets.stars} />
+          <ConnectionLines planetPositions={travelPlanets.stars} />
           <Stars />
-          <EmotionGalaxy cameraPos={[0, 0, 0]} />
-          {emotionPlanets.stars.map((star) => (
+          <TravelGalaxy cameraPos={[0, 0, 0]} />
+          {travelPlanets.stars.map((star) => (
             <Sphere
               key={star.id}
               position={star.position}
@@ -381,5 +398,4 @@ function EmotionPlanets() {
     </>
   );
 }
-
-export default EmotionPlanets;
+export default TravelPlanets;
