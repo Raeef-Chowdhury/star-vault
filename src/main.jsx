@@ -5,14 +5,11 @@ import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import EmotionPlanets from "./components/EmotionPlanets.jsx";
 import TravelPlanets from "./components/TravelPlanets.jsx";
+import { StarVaultProvider } from "./components/header"; // ← Add this import
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
-  },
-  {
-    path: "",
     element: <App />,
   },
   {
@@ -24,8 +21,11 @@ const router = createBrowserRouter([
     element: <TravelPlanets />,
   },
 ]);
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <StarVaultProvider>
+      <RouterProvider router={router} />
+    </StarVaultProvider>{" "}
   </StrictMode>
 );

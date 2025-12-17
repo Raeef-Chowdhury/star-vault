@@ -14,7 +14,7 @@ import Header from "./header";
 import SideBar from "./SideBar";
 import BackButton from "./BackButton";
 import { Html } from "@react-three/drei";
-import { galaxies } from "./Data";
+import { useStarVault } from "./header";
 // Seeded random number generator for consistent results
 
 function EmotionGalaxy({
@@ -322,14 +322,20 @@ function Sphere({ position, color, starData }) {
     </>
   );
 }
-
 function EmotionPlanets() {
-  const emotionPlanets = galaxies.find((galaxy) => galaxy.name == "Emotion");
+  const { galaxies } = useStarVault();
+
+  // Get only emotion galaxy stars - with safe fallback
+  const emotionGalaxy = galaxies.find((g) => g.id === "emotion");
+  const emotionStars = emotionGalaxy?.stars || [];
+
+  console.log("Galaxies:", galaxies);
+  console.log("Emotion Galaxy:", emotionGalaxy);
+  console.log("Emotion Stars:", emotionStars);
 
   return (
     <>
       <Header />
-
       <motion.div
         initial={{ opacity: 0, translateX: "-100%" }}
         animate={{ opacity: 1, translateX: 0 }}
@@ -349,10 +355,10 @@ function EmotionPlanets() {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines planetPositions={emotionPlanets.stars} />
+          <ConnectionLines planetPositions={emotionGalaxy.stars} />
           <Stars />
           <EmotionGalaxy cameraPos={[0, 0, 0]} />
-          {emotionPlanets.stars.map((star) => (
+          {emotionStars.map((star) => (
             <Sphere
               key={star.id}
               position={star.position}
