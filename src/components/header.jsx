@@ -123,14 +123,38 @@ export const useStarVault = () => {
 };
 
 // Provider Component - wrap your app with this
+// Provider Component - wrap your app with this
 export const StarVaultProvider = ({ children }) => {
-  const [galaxies, setGalaxies] = useState(initialGalaxies);
+  // Load galaxies from localStorage on initial mount, or use initialGalaxies as fallback
+  const [galaxies, setGalaxies] = useState(() => {
+    try {
+      const savedGalaxies = localStorage.getItem("starVaultGalaxies");
+      if (savedGalaxies) {
+        return JSON.parse(savedGalaxies);
+      }
+    } catch (error) {
+      console.error("Error loading galaxies from localStorage:", error);
+    }
+    return initialGalaxies;
+  });
+
+  // Save to localStorage whenever galaxies change
+  const saveToLocalStorage = (updatedGalaxies) => {
+    try {
+      localStorage.setItem(
+        "starVaultGalaxies",
+        JSON.stringify(updatedGalaxies)
+      );
+    } catch (error) {
+      console.error("Error saving galaxies to localStorage:", error);
+    }
+  };
 
   const addStar = (starData) => {
     const { title, description, date, galaxy, importance } = starData;
 
     setGalaxies((prevGalaxies) => {
-      return prevGalaxies.map((g) => {
+      const updatedGalaxies = prevGalaxies.map((g) => {
         if (g.id === galaxy) {
           const existingPositions = g.stars.map((s) => s.position);
           const seed = Date.now() + g.stars.length * 1000;
@@ -163,15 +187,21 @@ export const StarVaultProvider = ({ children }) => {
         }
         return g;
       });
+
+      saveToLocalStorage(updatedGalaxies);
+      return updatedGalaxies;
     });
   };
 
   const removeStar = (starId) => {
     setGalaxies((prevGalaxies) => {
-      return prevGalaxies.map((g) => ({
+      const updatedGalaxies = prevGalaxies.map((g) => ({
         ...g,
         stars: g.stars.filter((s) => s.id !== starId),
       }));
+
+      saveToLocalStorage(updatedGalaxies);
+      return updatedGalaxies;
     });
   };
 
@@ -187,7 +217,6 @@ export const StarVaultProvider = ({ children }) => {
     </StarVaultContext.Provider>
   );
 };
-
 function InfoModalContent({ setModal }) {
   return (
     <div className="relative w-full max-w-[1440px] rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-10 shadow-2xl border border-slate-700">
@@ -360,14 +389,43 @@ function AddModalContent({ setModal }) {
                     paddingRight: "3rem",
                   }}
                 >
-                  <option value="" disabled>
+                  <option
+                    value=""
+                    className="bg-slate-800 text-slate-300"
+                    disabled
+                  >
                     Choose a galaxy (category)...
                   </option>
-                  <option value="emotion">EMOTIONS</option>
-                  <option value="personal">PERSONAL</option>
-                  <option value="career">CAREER</option>
-                  <option value="travel">TRAVEL</option>
-                  <option value="milestone">MILESTONES</option>
+                  <option
+                    value="emotion"
+                    className="bg-slate-800 text-slate-300"
+                  >
+                    EMOTIONS
+                  </option>
+                  <option
+                    value="milky-way"
+                    className="bg-slate-800 text-slate-300"
+                  >
+                    PERSONAL
+                  </option>
+                  <option
+                    value="milky-way"
+                    className="bg-slate-800 text-slate-300"
+                  >
+                    CAREER
+                  </option>
+                  <option
+                    value="andromeda"
+                    className="bg-slate-800 text-slate-300"
+                  >
+                    TRAVEL
+                  </option>
+                  <option
+                    value="triangulum"
+                    className="bg-slate-800 text-slate-300"
+                  >
+                    MILESTONES
+                  </option>
                 </select>
               </div>
             </div>

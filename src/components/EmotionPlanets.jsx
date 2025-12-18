@@ -379,9 +379,12 @@ function EmotionPlanets() {
             }}
           />
         </Canvas>
-        <p className="text-gray-200 opacity-40 text-[2.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[1rem] ">
-          Select a Memory (Planet) to Explore
-        </p>
+        {emotionStars.length < 1 && (
+          <p className="text-text opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
+            Want to add something? Click Add Memory Form
+          </p>
+        )}
+
         <BackButton />
       </motion.div>
     </>
