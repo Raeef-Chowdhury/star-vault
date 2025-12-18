@@ -402,25 +402,25 @@ function AddModalContent({ setModal }) {
                     EMOTIONS
                   </option>
                   <option
-                    value="milky-way"
+                    value="personal"
                     className="bg-slate-800 text-slate-300"
                   >
                     PERSONAL
                   </option>
                   <option
-                    value="milky-way"
+                    value="career"
                     className="bg-slate-800 text-slate-300"
                   >
                     CAREER
                   </option>
                   <option
-                    value="andromeda"
+                    value="travel"
                     className="bg-slate-800 text-slate-300"
                   >
                     TRAVEL
                   </option>
                   <option
-                    value="triangulum"
+                    value="milestone"
                     className="bg-slate-800 text-slate-300"
                   >
                     MILESTONES

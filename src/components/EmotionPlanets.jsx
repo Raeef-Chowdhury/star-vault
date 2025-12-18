@@ -330,10 +330,6 @@ function EmotionPlanets() {
   const emotionGalaxy = galaxies.find((g) => g.id === "emotion");
   const emotionStars = emotionGalaxy?.stars || [];
 
-  console.log("Galaxies:", galaxies);
-  console.log("Emotion Galaxy:", emotionGalaxy);
-  console.log("Emotion Stars:", emotionStars);
-
   return (
     <>
       <Header />
