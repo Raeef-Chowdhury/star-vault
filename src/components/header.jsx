@@ -125,7 +125,6 @@ export const useStarVault = () => {
 // Provider Component - wrap your app with this
 // Provider Component - wrap your app with this
 export const StarVaultProvider = ({ children }) => {
-  // Load galaxies from localStorage on initial mount, or use initialGalaxies as fallback
   const [galaxies, setGalaxies] = useState(() => {
     try {
       const savedGalaxies = localStorage.getItem("starVaultGalaxies");

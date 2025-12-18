@@ -205,7 +205,7 @@ function Modal({ onClose, sphereData }) {
                     </div>
 
                     <div
-                      className={` bg-background bg-opacity-30 backdrop-blur-sm px-6 py-3 rounded-full border border-amber`}
+                      className={` bg-background bg-opacity-30 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-amber`}
                     >
                       <span
                         className={`text-${sphereData?.galaxy} text-[1.8rem] font-semibold uppercase tracking-wider`}

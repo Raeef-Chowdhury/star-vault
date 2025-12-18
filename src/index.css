@@ -41,4 +41,5 @@ html {
   --color-background: #0a0e1a;
   --color-slate: oklch(32% 0.035 260);
   --color-header: oklch(22% 0.055 270);
+  --color-emotion-light: #ff66aa/30;
 }
