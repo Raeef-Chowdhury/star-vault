@@ -5,7 +5,8 @@ import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import EmotionPlanets from "./components/EmotionPlanets.jsx";
 import TravelPlanets from "./components/TravelPlanets.jsx";
-import { StarVaultProvider } from "./components/header"; // ← Add this import
+import { StarVaultProvider } from "./components/header";
+import CareerPlanets from "./components/CareerPlanets.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/Travel",
     element: <TravelPlanets />,
+  },
+  {
+    path: "/Career",
+    element: <CareerPlanets />,
   },
 ]);
 

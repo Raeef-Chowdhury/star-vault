@@ -31,7 +31,6 @@ function CareerGalaxy({
   const navigate = useNavigate();
   const coreRef = useRef();
 
-  // Generate multi-arm spiral with density waves and bulge
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const armWidth = 0.4;

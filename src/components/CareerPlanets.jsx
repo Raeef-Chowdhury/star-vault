@@ -16,73 +16,79 @@ import { Html } from "@react-three/drei";
 import { useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useStarVault } from "./header";
-function TravelGalaxy({
-  count = 15000,
-  diskRadius = 10,
-  diskThickness = 0.8,
-  bulgeRadius = 3,
-  color = "#497d00",
-  radius = 3,
-  cameraPos,
+
+function CareerGalaxy({
+  count = 5000,
+  radius = 10,
+  arms = 3,
+  color = "#8200db",
+  cameraPos = [30, 0, 50], // ← Added this prop with default value
 }) {
   const { scale } = useSpring({
+    scale: 1.4,
     config: { tension: 200, friction: 20 },
   });
 
   const pointsRef = useRef();
-  const { positions, sizes } = useMemo(() => {
+  const coreRef = useRef();
+
+  const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const sizeArray = new Float32Array(count);
+    const armWidth = 0.4;
+    const bulgeDensity = 0.15; // 15% of stars in bulge
 
-    // Split between bulge and disk
-    const bulgeCount = Math.floor(count * 0.4); // 40% in central bulge
-    const diskCount = count - bulgeCount;
+    for (let i = 0; i < count; i++) {
+      const isBulge = Math.random() < bulgeDensity;
 
-    let idx = 0;
+      if (isBulge) {
+        // Dense spherical bulge at center
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = Math.pow(Math.random(), 1.5) * radius * 0.25;
 
-    // Create bright central bulge (spherical)
-    for (let i = 0; i < bulgeCount; i++) {
-      const r = Math.pow(Math.random(), 0.7) * bulgeRadius;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+        pos.set(
+          [
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta) * 0.3,
+            r * Math.cos(phi),
+          ],
+          i * 3
+        );
+      } else {
+        // Multiple spiral arms with logarithmic spacing
+        const t = Math.pow(i / count, 0.8) * Math.PI * 3;
+        const armIndex = Math.floor(Math.random() * arms);
+        const armAngle = (armIndex / arms) * Math.PI * 2;
 
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta) * 0.7; // Slightly flattened
-      const z = r * Math.cos(phi);
+        const r = radius * Math.pow(i / count, 0.9);
+        const angle = t + armAngle;
 
-      pos.set([x, y, z], idx * 3);
+        // Logarithmic spiral with density variations
+        const x =
+          Math.cos(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
+        const y = (Math.random() - 0.5) * Math.exp(-r / radius) * 0.4;
+        const z =
+          Math.sin(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
 
-      // Brighter stars in bulge
-      sizeArray[idx] = 0.04 + Math.random() * 0.03;
-      idx++;
+        pos.set([x, y, z], i * 3);
+      }
     }
 
-    // Create smooth disk with NO spiral arms
-    for (let i = 0; i < diskCount; i++) {
-      // Exponential distribution for realistic disk
-      const r =
-        bulgeRadius + Math.pow(Math.random(), 0.5) * (diskRadius - bulgeRadius);
-      const theta = Math.random() * Math.PI * 2;
+    return pos;
+  }, [count, radius, arms]);
 
-      const x = r * Math.cos(theta);
-      const z = r * Math.sin(theta);
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime();
 
-      // Very thin disk with slight variation
-      const y =
-        (Math.random() - 0.5) * diskThickness * Math.exp(-r / diskRadius);
-
-      pos.set([x, y, z], idx * 3);
-
-      // Dimmer stars in outer disk
-      sizeArray[idx] = 0.015 * (1 - (r / diskRadius) * 0.5);
-      idx++;
+    // Differential rotation (inner parts rotate faster)
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = time * 1.22;
     }
 
-    return { positions: pos, sizes: sizeArray };
-  }, [count, diskRadius, diskThickness, bulgeRadius]);
-
-  useFrame(() => {
-    pointsRef.current.rotation.y += 0.0338;
+    // Counter-rotating core
+    if (coreRef.current) {
+      coreRef.current.rotation.y = -time * 0.05;
+    }
   });
 
   return (
@@ -102,7 +108,7 @@ function TravelGalaxy({
             />
             <bufferAttribute
               attach="attributes-size"
-              array={sizes}
+              array={positions.map(() => 1)}
               count={count}
               itemSize={1}
             />
@@ -122,6 +128,7 @@ function TravelGalaxy({
     </>
   );
 }
+
 function Modal({ onClose, sphereData }) {
   const { removeStar } = useStarVault();
   const handleDelete = () => {
@@ -132,10 +139,6 @@ function Modal({ onClose, sphereData }) {
       }
     }
   };
-  const titleCount = sphereData?.title?.length;
-  const despCount = sphereData?.description?.length;
-  console.log(despCount, titleCount);
-
   return (
     <Html
       fullscreen
@@ -155,15 +158,7 @@ function Modal({ onClose, sphereData }) {
         />
 
         {/* Modal Content */}
-        <div
-          className={`fixed top-1/2 left-1/2  max-w-[788px] ${
-            titleCount > 50 ? "max-w-[944px]" : ""
-          } ${despCount > 1000 ? "max-w-[1444px]" : ""}  ${
-            despCount > 500 ? "max-w-[1280px]" : ""
-          } ${
-            despCount > 250 ? "max-w-[1028px]" : ""
-          } -translate-x-1/2 -translate-y-1/2 w-screen h-screen flex items-center justify-center z-[9999] p-5 pointer-events-none`}
-        >
+        <div className="fixed top-1/2 left-1/2 max-w-[788px] -translate-x-1/2 -translate-y-1/2 w-screen h-screen flex items-center justify-center z-[9999] p-5 pointer-events-none">
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -178,11 +173,11 @@ function Modal({ onClose, sphereData }) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full overflow-y-scroll overflow-x-hidden max-h-[80vh] wrap-break-word  rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-10 shadow-2xl border border-slate-700">
+            <div className="relative w-full rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-10 shadow-2xl border border-slate-700">
               <div className="space-y-8">
                 <div className="rounded-lg mx-auto  text-center backdrop-blur p-6 md:p-8 ">
-                  <h3 className="text-[7.2rem] md:text-5xl  lg:text-[4.8rem] mb-6 md:mb-8 lg:mb-[2.4rem] font-semibold text-primary flex items-center gap-2 justify-center flex-wrap">
-                    <span className="text-[4.8rem] mt-[3.6rem] block max-w-full break-words hyphens-auto mb-[4.8rem] ">
+                  <h3 className="text-[7.2rem] md:text-5xl lg:text-[4.8rem] mb-6 md:mb-8 lg:mb-[2.4rem] font-semibold text-primary flex items-center gap-2 justify-center flex-wrap">
+                    <span className="text-[4.8rem] mb-[4.8rem]">
                       {sphereData?.title || "Memory Details"}
                     </span>
                   </h3>
@@ -235,13 +230,7 @@ function Modal({ onClose, sphereData }) {
                       </span>
                     </div>
                   </div>
-                  <div
-                    className={`space-y-4 text-sm md:text-base lg:text-[1.6rem] p-3 md:p-4 lg:p-[1rem] max-w-[644px] ${
-                      despCount > 1000 ? "max-w-[1444px]" : ""
-                    } ${
-                      despCount > 500 ? "max-w-[1280px]" : ""
-                    } mx-auto mt-[4rem] text-text  leading-relaxed`}
-                  >
+                  <div className="space-y-4 text-sm md:text-base lg:text-[1.6rem] p-3 md:p-4 lg:p-[1rem] max-w-[644px] mx-auto mt-[4rem] text-text  leading-relaxed">
                     <p className="text-[2.4rem]">
                       {sphereData?.description ||
                         "This is your memory sphere. Click to explore."}
@@ -391,10 +380,11 @@ function Sphere({ position, color, starData }) {
     </>
   );
 }
-function TravelPlanets() {
+function CareerPlanets() {
   const { galaxies } = useStarVault();
-  const travelGalaxy = galaxies.find((galaxy) => galaxy.id === "travel");
-  const travelPlanets = travelGalaxy?.stars || [];
+  const careerGalaxy = galaxies.find((galaxy) => galaxy.id === "career");
+  const careerPlanets = careerGalaxy?.stars || [];
+
   return (
     <>
       <Header />
@@ -405,8 +395,8 @@ function TravelPlanets() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="h-[100vh] w-[100vw] relative bg-black"
       >
-        <p className="text-travel text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          TRAVEL PLANETS ⋅ ({travelPlanets.length})
+        <p className="text-career text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+          CAREER PLANETS ⋅ ({careerPlanets.length})
         </p>
         <SideBar />
         <Canvas
@@ -418,10 +408,10 @@ function TravelPlanets() {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines planetPositions={travelGalaxy.stars} />
+          <ConnectionLines planetPositions={careerGalaxy?.stars} />
           <Stars />
-          <TravelGalaxy cameraPos={[0, 0, 0]} />
-          {travelPlanets.map((star) => (
+          <CareerGalaxy cameraPos={[0, 0, 0]} />
+          {careerPlanets.map((star) => (
             <Sphere
               key={star.id}
               position={star.position}
@@ -443,7 +433,7 @@ function TravelPlanets() {
           />
         </Canvas>
         <BackButton />{" "}
-        {travelPlanets.length < 1 && (
+        {careerPlanets.length < 1 && (
           <p className="text-text opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
             Want to add something? Click Add Memory Form
           </p>
@@ -452,4 +442,5 @@ function TravelPlanets() {
     </>
   );
 }
-export default TravelPlanets;
+
+export default CareerPlanets;

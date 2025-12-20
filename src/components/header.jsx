@@ -556,7 +556,7 @@ export function Header() {
             </svg>
             <div>
               <p className="text-[1.6rem] opacity-90">
-                {memoryTitle.toUpperCase()} has been added to{" "}
+                {memoryTitle.slice(0, 25).toUpperCase()}... has been added to{" "}
                 {memoryGalaxy.toUpperCase()} Galaxy!!
               </p>
             </div>
