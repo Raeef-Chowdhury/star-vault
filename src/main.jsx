@@ -7,7 +7,8 @@ import EmotionPlanets from "./components/EmotionPlanets.jsx";
 import TravelPlanets from "./components/TravelPlanets.jsx";
 import { StarVaultProvider } from "./components/header";
 import CareerPlanets from "./components/CareerPlanets.jsx";
-
+import PersonalPlanets from "./components/PersonalPlanets.jsx";
+import MileStonePlanets from "./components/MileStonePlanets.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
   {
     path: "/Career",
     element: <CareerPlanets />,
+  },
+  {
+    path: "/Personal",
+    element: <PersonalPlanets />,
+  },
+  {
+    path: "/Milestone",
+    element: <MileStonePlanets />,
   },
 ]);
 

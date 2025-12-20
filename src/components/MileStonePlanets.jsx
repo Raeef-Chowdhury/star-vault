@@ -16,11 +16,12 @@ import { useState } from "react";
 import { useStarVault } from "./header";
 import Sphere from "./GalaxySphere";
 
-function CareerGalaxy({
-  count = 5000,
-  radius = 5,
-  arms = 3,
-  color = "#4488ff",
+function PersGalaxy({
+  count = 8000,
+  radiusX = 6,
+  radiusY = 4,
+  radiusZ = 6,
+  color = "#ff8844",
   cameraPos = [30, 0, 50], // ← Added this prop with default value
 }) {
   const { scale } = useSpring({
@@ -29,72 +30,64 @@ function CareerGalaxy({
   });
 
   const pointsRef = useRef();
-  const coreRef = useRef();
 
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const armWidth = 0.4;
-    const bulgeDensity = 0.15; // 15% of stars in bulge
 
     for (let i = 0; i < count; i++) {
-      const isBulge = Math.random() < bulgeDensity;
+      const r = Math.pow(Math.random(), 0.5);
 
-      if (isBulge) {
-        // Dense spherical bulge at center
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        const r = Math.pow(Math.random(), 1.5) * radius * 0.25;
+      // Random spherical coordinates
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
 
-        pos.set(
-          [
-            r * Math.sin(phi) * Math.cos(theta),
-            r * Math.sin(phi) * Math.sin(theta) * 0.3,
-            r * Math.cos(phi),
-          ],
-          i * 3
-        );
-      } else {
-        // Multiple spiral arms with logarithmic spacing
-        const t = Math.pow(i / count, 0.8) * Math.PI * 3;
-        const armIndex = Math.floor(Math.random() * arms);
-        const armAngle = (armIndex / arms) * Math.PI * 2;
+      const x = r * radiusX * Math.sin(phi) * Math.cos(theta);
+      const y = r * radiusY * Math.sin(phi) * Math.sin(theta);
+      const z = r * radiusZ * Math.cos(phi);
 
-        const r = radius * Math.pow(i / count, 0.9);
-        const angle = t + armAngle;
-
-        // Logarithmic spiral with density variations
-        const x =
-          Math.cos(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
-        const y = (Math.random() - 0.5) * Math.exp(-r / radius) * 0.4;
-        const z =
-          Math.sin(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
-
-        pos.set([x, y, z], i * 3);
-      }
+      // Add slight randomness
+      const scatter = 0.3 * (1 - r); // Less scatter near core
+      pos.set(
+        [
+          x + (Math.random() - 0.5) * scatter,
+          y + (Math.random() - 0.5) * scatter,
+          z + (Math.random() - 0.5) * scatter,
+        ],
+        i * 3
+      );
     }
 
     return pos;
-  }, [count, radius, arms]);
+  }, [count, radiusX, radiusY, radiusZ]);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  // Vary star sizes based on distance from core
+  const sizes = useMemo(() => {
+    const sizeArray = new Float32Array(count);
 
-    // Differential rotation (inner parts rotate faster)
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y = time * 1.22;
+    for (let i = 0; i < count; i++) {
+      const x = positions[i * 3];
+      const y = positions[i * 3 + 1];
+      const z = positions[i * 3 + 2];
+      const distFromCore = Math.sqrt(x * x + y * y + z * z);
+
+      // Stars near core are bigger and brighter
+      sizeArray[i] = 0.05 - (distFromCore / radiusX) * 0.03;
     }
 
-    // Counter-rotating core
-    if (coreRef.current) {
-      coreRef.current.rotation.y = -time * 0.05;
-    }
+    return sizeArray;
+  }, [positions, radiusX]);
+
+  // Slow tumbling rotation
+  useFrame(() => {
+    pointsRef.current.rotation.x += 0.0003;
+    pointsRef.current.rotation.y += 0.0105;
   });
 
   return (
     <>
       <group position={cameraPos}>
         <mesh>
-          <sphereGeometry args={[radius * 1.2, 32, 32]} />
+          <sphereGeometry args={[radiusY * 1.2, 32, 32]} />
           <meshBasicMaterial visible={false} />
         </mesh>
         <animated.points ref={pointsRef} scale={scale}>
@@ -107,7 +100,7 @@ function CareerGalaxy({
             />
             <bufferAttribute
               attach="attributes-size"
-              array={positions.map(() => 1)}
+              array={sizes}
               count={count}
               itemSize={1}
             />
@@ -127,10 +120,10 @@ function CareerGalaxy({
     </>
   );
 }
-function CareerPlanets() {
+function MileStonePlanets() {
   const { galaxies } = useStarVault();
-  const careerGalaxy = galaxies.find((galaxy) => galaxy.id === "career");
-  const careerPlanets = careerGalaxy?.stars || [];
+  const MilestoneGalaxy = galaxies.find((galaxy) => galaxy.id === "milestone");
+  const MilestonePlanets = MilestoneGalaxy?.stars || [];
   const [hoveredSphere, setHoveredSphere] = useState(null);
   const [openModal, setOpenModal] = useState(null);
   return (
@@ -143,8 +136,8 @@ function CareerPlanets() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="h-[100vh] w-[100vw] relative bg-black"
       >
-        <p className="text-career text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          CAREER PLANETS ⋅ ({careerPlanets.length})
+        <p className="text-milestone text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+          MILESTONE PLANETS ⋅ ({MilestonePlanets.length})
         </p>
         <SideBar />
         <Canvas
@@ -156,11 +149,11 @@ function CareerPlanets() {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines planetPositions={careerGalaxy?.stars} />
+          <ConnectionLines planetPositions={MilestoneGalaxy?.stars} />
           <Stars />
-          <CareerGalaxy cameraPos={[0, 0, 0]} />
+          <PersGalaxy cameraPos={[0, 0, 0]} />
 
-          {careerPlanets.map((star) => (
+          {MilestonePlanets.map((star) => (
             <Sphere
               key={star.id}
               position={star.position}
@@ -188,7 +181,7 @@ function CareerPlanets() {
           />
         </Canvas>
         <BackButton />{" "}
-        {careerPlanets.length < 1 && (
+        {MilestonePlanets.length < 1 && (
           <p className="text-text opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
             Want to add something? Click Add Memory Form
           </p>
@@ -198,4 +191,4 @@ function CareerPlanets() {
   );
 }
 
-export default CareerPlanets;
+export default MileStonePlanets;

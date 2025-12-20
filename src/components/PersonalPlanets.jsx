@@ -16,11 +16,12 @@ import { useState } from "react";
 import { useStarVault } from "./header";
 import Sphere from "./GalaxySphere";
 
-function CareerGalaxy({
-  count = 5000,
-  radius = 5,
-  arms = 3,
-  color = "#4488ff",
+function PersGalaxy({
+  count = 12000,
+  innerRadius = 2,
+  outerRadius = 6,
+  ringThickness = 1.5,
+  color = "#8200db",
   cameraPos = [30, 0, 50], // ← Added this prop with default value
 }) {
   const { scale } = useSpring({
@@ -29,72 +30,74 @@ function CareerGalaxy({
   });
 
   const pointsRef = useRef();
-  const coreRef = useRef();
 
+  // Generate ring/hourglass galaxy distribution
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const armWidth = 0.4;
-    const bulgeDensity = 0.15; // 15% of stars in bulge
 
     for (let i = 0; i < count; i++) {
-      const isBulge = Math.random() < bulgeDensity;
+      // Create ring structure with gap in middle
+      const ringPos = Math.random();
+      const radius = innerRadius + ringPos * (outerRadius - innerRadius);
 
-      if (isBulge) {
-        // Dense spherical bulge at center
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        const r = Math.pow(Math.random(), 1.5) * radius * 0.25;
+      // Random angle around the ring
+      const theta = Math.random() * Math.PI * 2;
 
-        pos.set(
-          [
-            r * Math.sin(phi) * Math.cos(theta),
-            r * Math.sin(phi) * Math.sin(theta) * 0.3,
-            r * Math.cos(phi),
-          ],
-          i * 3
-        );
-      } else {
-        // Multiple spiral arms with logarithmic spacing
-        const t = Math.pow(i / count, 0.8) * Math.PI * 3;
-        const armIndex = Math.floor(Math.random() * arms);
-        const armAngle = (armIndex / arms) * Math.PI * 2;
+      // Height varies - creates the ring/torus shape
+      const heightFactor = Math.pow(Math.random(), 2);
+      const height = (Math.random() - 0.5) * ringThickness * heightFactor;
 
-        const r = radius * Math.pow(i / count, 0.9);
-        const angle = t + armAngle;
+      // Position in ring
+      const x = radius * Math.cos(theta);
+      const z = radius * Math.sin(theta);
+      const y = height;
 
-        // Logarithmic spiral with density variations
-        const x =
-          Math.cos(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
-        const y = (Math.random() - 0.5) * Math.exp(-r / radius) * 0.4;
-        const z =
-          Math.sin(angle) * r + (Math.random() - 0.5) * armWidth * r * 0.3;
-
-        pos.set([x, y, z], i * 3);
-      }
+      // Add turbulence that increases with radius
+      const turbulence = 0.3 * (radius / outerRadius);
+      pos.set(
+        [
+          x + (Math.random() - 0.5) * turbulence,
+          y + (Math.random() - 0.5) * turbulence * 0.5,
+          z + (Math.random() - 0.5) * turbulence,
+        ],
+        i * 3
+      );
     }
 
     return pos;
-  }, [count, radius, arms]);
+  }, [count, innerRadius, outerRadius, ringThickness]);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  const sizes = useMemo(() => {
+    const sizeArray = new Float32Array(count);
 
-    // Differential rotation (inner parts rotate faster)
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y = time * 1.22;
+    for (let i = 0; i < count; i++) {
+      const x = positions[i * 3];
+      const y = positions[i * 3 + 1];
+      const z = positions[i * 3 + 2];
+
+      const radiusFromCenter = Math.sqrt(x * x + z * z);
+      const heightFromPlane = Math.abs(y);
+
+      // Stars in the ring plane are brighter
+      const planeFactor = 1 - Math.min(heightFromPlane / ringThickness, 1);
+      const ringFactor = radiusFromCenter > innerRadius ? 1 : 0.5;
+
+      sizeArray[i] = 0.02 + planeFactor * 0.04 * ringFactor;
     }
 
-    // Counter-rotating core
-    if (coreRef.current) {
-      coreRef.current.rotation.y = -time * 0.05;
-    }
+    return sizeArray;
+  }, [positions, innerRadius, ringThickness]);
+
+  // Rotate the ring galaxy
+  useFrame(() => {
+    pointsRef.current.rotation.y += 0.0061;
+    pointsRef.current.rotation.x = Math.sin(Date.now() * 0.0001) * 0.1;
   });
-
   return (
     <>
       <group position={cameraPos}>
         <mesh>
-          <sphereGeometry args={[radius * 1.2, 32, 32]} />
+          <sphereGeometry args={[outerRadius * 1.2, 32, 32]} />
           <meshBasicMaterial visible={false} />
         </mesh>
         <animated.points ref={pointsRef} scale={scale}>
@@ -107,7 +110,7 @@ function CareerGalaxy({
             />
             <bufferAttribute
               attach="attributes-size"
-              array={positions.map(() => 1)}
+              array={sizes}
               count={count}
               itemSize={1}
             />
@@ -127,10 +130,10 @@ function CareerGalaxy({
     </>
   );
 }
-function CareerPlanets() {
+function PersonalPlanets() {
   const { galaxies } = useStarVault();
-  const careerGalaxy = galaxies.find((galaxy) => galaxy.id === "career");
-  const careerPlanets = careerGalaxy?.stars || [];
+  const PersonalGalaxy = galaxies.find((galaxy) => galaxy.id === "personal");
+  const PersonalPlanets = PersonalGalaxy?.stars || [];
   const [hoveredSphere, setHoveredSphere] = useState(null);
   const [openModal, setOpenModal] = useState(null);
   return (
@@ -143,8 +146,8 @@ function CareerPlanets() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="h-[100vh] w-[100vw] relative bg-black"
       >
-        <p className="text-career text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          CAREER PLANETS ⋅ ({careerPlanets.length})
+        <p className="text-personal text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+          PERSONAL PLANETS ⋅ ({PersonalPlanets.length})
         </p>
         <SideBar />
         <Canvas
@@ -156,11 +159,11 @@ function CareerPlanets() {
         >
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ConnectionLines planetPositions={careerGalaxy?.stars} />
+          <ConnectionLines planetPositions={PersonalGalaxy?.stars} />
           <Stars />
-          <CareerGalaxy cameraPos={[0, 0, 0]} />
+          <PersGalaxy cameraPos={[0, 0, 0]} />
 
-          {careerPlanets.map((star) => (
+          {PersonalPlanets.map((star) => (
             <Sphere
               key={star.id}
               position={star.position}
@@ -188,7 +191,7 @@ function CareerPlanets() {
           />
         </Canvas>
         <BackButton />{" "}
-        {careerPlanets.length < 1 && (
+        {PersonalPlanets.length < 1 && (
           <p className="text-text opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
             Want to add something? Click Add Memory Form
           </p>
@@ -198,4 +201,4 @@ function CareerPlanets() {
   );
 }
 
-export default CareerPlanets;
+export default PersonalPlanets;

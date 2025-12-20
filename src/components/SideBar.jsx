@@ -1,12 +1,12 @@
 import { useLocation } from "react-router";
 import { useNavigate } from "react-router";
-const sideBar = ["emotion", "travel", "career", "personal", "milestones"];
+const sideBar = ["emotion", "travel", "career", "personal", "milestone"];
 const colorClasses = {
   emotion: "bg-emotion",
   travel: "bg-travel",
   career: "bg-career",
   personal: "bg-personal",
-  milestones: "bg-milestones",
+  milestone: "bg-milestone",
 };
 function SideBar() {
   const location = useLocation();

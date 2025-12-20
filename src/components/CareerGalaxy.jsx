@@ -10,7 +10,7 @@ function CareerGalaxy({
   count = 5000,
   radius = 10,
   arms = 3,
-  color = "#8200db",
+  color = "#4488ff",
 }) {
   const [hovered, isHovered] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });

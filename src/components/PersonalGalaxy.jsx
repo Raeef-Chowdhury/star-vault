@@ -12,7 +12,7 @@ function PersonalGalaxy({
   innerRadius = 4,
   outerRadius = 12,
   ringThickness = 1.5,
-  color = "#4488ff",
+  color = "#8200db",
 }) {
   const [hovered, isHovered] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, z: 0 });

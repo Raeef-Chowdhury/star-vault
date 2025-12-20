@@ -83,7 +83,7 @@ function MilestoneGalaxy({
     pointsRef.current.rotation.y += 0.0105;
   });
   const handleClick = () => {
-    navigate("/milestones");
+    navigate("/milestone");
   };
   console.log(sizes);
   return (
