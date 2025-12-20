@@ -326,7 +326,6 @@ function Sphere({ position, color, starData }) {
 function EmotionPlanets() {
   const { galaxies } = useStarVault();
 
-  // Get only emotion galaxy stars - with safe fallback
   const emotionGalaxy = galaxies.find((g) => g.id === "emotion");
   const emotionStars = emotionGalaxy?.stars || [];
 
@@ -340,7 +339,7 @@ function EmotionPlanets() {
         className="h-[100vh] w-[100vw] relative bg-black"
       >
         <p className="text-emotion text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          EMOTION PLANETS
+          EMOTION PLANETS ⋅ ({emotionStars.length})
         </p>
         <SideBar />
         <Canvas

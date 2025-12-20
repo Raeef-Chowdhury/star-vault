@@ -18,9 +18,16 @@ function ConnectionLines({ planetPositions }) {
     return new Float32Array(positions);
   }, [planetPositions]);
 
+  // Update the geometry when linePositions changes
+  React.useEffect(() => {
+    if (linesRef.current) {
+      linesRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+  }, [linePositions]);
+
   return (
     <lineSegments ref={linesRef}>
-      <bufferGeometry>
+      <bufferGeometry key={planetPositions.length}>
         <bufferAttribute
           attach="attributes-position"
           count={linePositions.length / 3}

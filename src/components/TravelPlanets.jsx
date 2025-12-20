@@ -271,7 +271,7 @@ function Modal({ onClose, sphereData }) {
                 </button>{" "}
                 <button
                   onClick={() => handleDelete()}
-                  className="absolute top-[20px] hover:text-amber right-[60px] bg-transparent border-none cursor-pointer padding-[8px] flex items-center justify-center text-slate-300 transition-all 300ms z-10"
+                  className="absolute top-[20px]  hover:text-amber right-[60px] bg-transparent border-none cursor-pointer padding-[8px] flex items-center justify-center text-slate-300 transition-all 300ms z-10"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

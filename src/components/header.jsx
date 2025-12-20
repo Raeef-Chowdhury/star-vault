@@ -288,7 +288,7 @@ function InfoModalContent({ setModal }) {
   );
 }
 
-function AddModalContent({ setModal }) {
+function AddModalContent({ setModal, onSuccess }) {
   const { addStar } = useStarVault();
   const [formData, setFormData] = useState({
     title: "",
@@ -297,7 +297,6 @@ function AddModalContent({ setModal }) {
     description: "",
     importance: 3,
   });
-
   const handleSubmit = () => {
     if (!formData.title || !formData.galaxy || !formData.date) {
       alert("Please fill in all required fields (Title, Date, Galaxy)");
@@ -305,6 +304,7 @@ function AddModalContent({ setModal }) {
     }
 
     addStar(formData);
+    onSuccess(formData.title, formData.galaxy);
     setModal(false);
 
     setFormData({
@@ -514,10 +514,54 @@ function AddModalContent({ setModal }) {
 export function Header() {
   const [infoModal, setInfoModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [memoryTitle, setMemoryTitle] = useState("");
+  const [memoryGalaxy, setMemoryGalaxy] = useState("");
+
+  const handleMemoryAdded = (title, galaxy) => {
+    setMemoryTitle(title);
+    setMemoryGalaxy(galaxy);
+    setShowConfirmation(true);
+    setTimeout(() => {
+      setShowConfirmation(false);
+    }, 3000);
+  };
 
   return (
     <>
       <AnimatePresence>
+        {showConfirmation && (
+          <motion.div
+            key="literally anything"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-[60] bg-gradient-to-r from-green-500 to-emerald-600 text-white px-12 py-6 rounded-2xl shadow-2xl flex items-center gap-6 border-2 border-green-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-white"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <div>
+              <p className="text-[1.6rem] opacity-90">
+                {memoryTitle.toUpperCase()} has been added to{" "}
+                {memoryGalaxy.toUpperCase()} Galaxy!!
+              </p>
+            </div>
+          </motion.div>
+        )}
         {infoModal && (
           <motion.div
             initial={{ opacity: 0, y: -15 }}
@@ -547,7 +591,10 @@ export function Header() {
             }}
             className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-50 bg-slate-950/90"
           >
-            <AddModalContent setModal={setAddModal} />
+            <AddModalContent
+              setModal={setAddModal}
+              onSuccess={handleMemoryAdded}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -600,5 +647,4 @@ export function Header() {
     </>
   );
 }
-
 export default Header;
