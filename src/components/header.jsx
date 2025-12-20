@@ -25,7 +25,7 @@ function isValidPosition(newPos, existingPositions, minGap) {
 function randomPosition(
   seed,
   center = [0, 0, 0],
-  minRadius = 16,
+  minRadius = 25,
   maxRadius = 120,
   existingPositions = [],
   minGap = 2.5
