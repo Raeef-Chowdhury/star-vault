@@ -141,14 +141,20 @@ function CareerPlanets() {
         initial={{ opacity: 0, translateX: "-100%" }}
         animate={{ opacity: 1, translateX: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="h-[100vh] w-[100vw] relative bg-black"
+        className="h-[200vh] max-[1921px]:h-[160vh] max-2xl:h-[155vh] max-xl:h-[140vh] max-lg:h-[135vh] max-md:h-[110vh] max-sm:h-[90vh] w-screen relative bg-black overflow-hidden"
       >
-        <p className="text-career text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
-          CAREER PLANETS ⋅ ({careerPlanets.length})
-        </p>
+        <div className="flex max-md:flex-col gap-[8rem] max-2xl:gap-[6rem] max-xl:gap-[4rem] max-lg:gap-[3rem] max-md:gap-[2rem] max-sm:gap-[1.5rem] justify-between p-[4rem] max-2xl:p-[3rem] max-xl:p-[2.5rem] max-lg:p-[2rem] max-md:p-[1.5rem] max-sm:p-[1rem] items-center max-md:items-center">
+          <p className="text-career text-[4.8rem] max-2xl:text-[4.2rem] max-xl:text-[3.6rem] max-lg:text-[3rem] tracking-[1.5rem] max-2xl:tracking-[1.3rem] max-xl:tracking-[1.1rem] max-lg:tracking-[0.9rem] max-md:tracking-[0.6rem]  max-md:text-[3.6rem] max-md:mt-[4.8rem] max-md:mb-[4.8rem] max-sm:tracking-[0.3rem] leading-tight">
+            CAREER PLANETS ⋅ ({CareerPlanets.length})
+          </p>
+          <BackButton />
+        </div>
         <SideBar />
         <Canvas
-          camera={{ position: [-30, 24, 1.2], fov: 100 }}
+          camera={{
+            position: [-30, 24, 1.2],
+            fov: 100,
+          }}
           style={{
             width: "100%",
             height: "100%",
@@ -187,9 +193,8 @@ function CareerPlanets() {
             }}
           />
         </Canvas>
-        <BackButton />{" "}
         {careerPlanets.length < 1 && (
-          <p className="text-text opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
+          <p className="text-text max-md:hidden opacity-60 text-[1.4rem] uppercase absolute transform left-1/2 transform translate-x-[-50%] bottom-10 tracking-[0.4rem] ">
             Want to add something? Click Add Memory Form
           </p>
         )}

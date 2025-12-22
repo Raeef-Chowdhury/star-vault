@@ -598,7 +598,7 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-      <header className="p-[2rem] bg-slate-900 flex items-center max-w-[1920px]">
+      <header className="p-[2rem] bg-slate-900 flex items-center w-[100vw]">
         <ul className="pb-[1.5rem] flex items-center justify-between w-full">
           <li className="flex items-center gap-[1.8rem] text-white text-[4.8rem] tracking-[1.2rem]">
             <Sparkles className="p-6 rounded-full w-20 h-20 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]" />

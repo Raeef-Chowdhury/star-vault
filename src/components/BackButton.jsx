@@ -3,7 +3,7 @@ import { Link } from "react-router";
 function BackButton() {
   return (
     <Link to="/">
-      <button className="text-primary flex items-center gap-[1.2rem] hover:gap-[2.4rem] hover:cursor-pointer border-slate border-2 transition-all rounded-full px-[1.8rem] py-[0.2rem] bg-background text-[2.4rem] uppercase absolute transform top-17 right-25 tracking-[0.6rem] ">
+      <button className="text-primary flex items-center gap-[1.2rem] hover:gap-[2.4rem] hover:cursor-pointer border-slate border-2 transition-all rounded-full px-[1.8rem] py-[0.2rem] bg-background text-[2.4rem] uppercase  tracking-[0.6rem] ">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"

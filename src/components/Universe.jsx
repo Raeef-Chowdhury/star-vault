@@ -21,7 +21,7 @@ function Scence() {
       animate={{ opacity: 1, translateX: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       key={"universe-page"}
-      className="relative h-[100vh] w-[100vw] relative bg-black"
+      className="relative h-[120vh] w-[100vw] relative bg-black"
     >
       <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
         UNIVERSE

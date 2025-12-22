@@ -27,7 +27,7 @@ function Sphere({
   };
 
   const { scale } = useSpring({
-    scale: isHovered ? 1.4 : 1,
+    scale: isHovered ? 1.2 : 1,
     config: { tension: 300, friction: 10 },
   });
 
@@ -77,7 +77,7 @@ function Sphere({
         </mesh>
 
         <animated.mesh scale={scale}>
-          <sphereGeometry args={[1, 32, 32]} />
+          <sphereGeometry args={[starData.stars * 0.1 + 0.8, 32, 32]} />
           <meshStandardMaterial color={color} />
         </animated.mesh>
       </group>
