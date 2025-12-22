@@ -21,9 +21,9 @@ function Scence() {
       animate={{ opacity: 1, translateX: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       key={"universe-page"}
-      className="relative h-[120vh] w-[100vw] relative bg-black"
+      className="relative h-[120vh] min-[1920px]:h-[100vh] w-[100vw] relative bg-black overflow-hidden"
     >
-      <p className="text-white text-[4.8rem] absolute top-10 left-10 tracking-[1.5rem]">
+      <p className="text-primary max-md:text-[6rem] max-md:static absolute top-10 left-10  mt-[1.6rem] text-[4.8rem] tracking-[1.5rem]">
         UNIVERSE
       </p>
       <SideBar />

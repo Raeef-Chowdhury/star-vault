@@ -598,19 +598,19 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-      <header className="p-[2rem] bg-slate-900 flex items-center w-[100vw]">
-        <ul className="pb-[1.5rem] flex items-center justify-between w-full">
-          <li className="flex items-center gap-[1.8rem] text-white text-[4.8rem] tracking-[1.2rem]">
-            <Sparkles className="p-6 rounded-full w-20 h-20 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]" />
+      <header className="p-4 md:p-6 lg:p-8 bg-slate-900 flex items-center w-full">
+        <ul className="pb-4 md:pb-6 2xl:pb-8 flex flex-row items-center justify-between w-full">
+          <li className="flex items-center gap-3 md:gap-6 lg:gap-7 2xl:gap-9 text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl tracking-wider md:tracking-widest">
+            <Sparkles className="p-3 md:p-4 lg:p-6 2xl:p-8 rounded-full w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 2xl:w-24 2xl:h-24 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]" />
             <p>STAR VAULT</p>
           </li>
 
-          <li className="relative flex items-center gap-[6rem]">
+          <li className="relative flex flex-row items-center gap-4 md:gap-8 lg:gap-12 xl:gap-24 2xl:gap-32">
             <button
               onClick={() => setAddModal(true)}
-              className="hover:cursor-pointer px-[3.2rem] flex items-center justify-between gap-[2.4rem] rounded-full bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-[2rem] border-2 border-gray-700"
+              className="hover:cursor-pointer px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 md:py-3 2xl:py-4 flex items-center justify-between gap-3 md:gap-4 lg:gap-6 xl:gap-9 2xl:gap-12 rounded-full bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl border-2 border-gray-700"
             >
-              <span className="text-[3.6rem] text-blue-500 transform translate-y-[-0.5rem]">
+              <span className="text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl text-blue-500 transform translate-y-[-0.2rem] md:translate-y-[-0.3rem] lg:translate-y-[-0.5rem] 2xl:translate-y-[-0.6rem]">
                 +
               </span>
               <span>ADD MEMORY</span>
@@ -618,26 +618,26 @@ export function Header() {
 
             <button
               onClick={() => setInfoModal(true)}
-              className="group relative hover:cursor-pointer px-[3.2rem] py-[1.2rem] flex items-center justify-between gap-[2.4rem] rounded-full bg-white text-slate-800 font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-[2rem] border-2 border-amber-400"
+              className="group relative hover:cursor-pointer px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 md:py-3 2xl:py-4 flex items-center justify-between gap-3 md:gap-4 lg:gap-6 xl:gap-9 2xl:gap-12 rounded-full bg-white text-slate-800 font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl border-2 border-amber-400"
             >
               WHAT IS THIS?
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="purple"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-primary"
+                className="text-primary w-5 h-5 md:w-6 md:h-6 2xl:w-7 2xl:h-7"
               >
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 16v-4" />
                 <path d="M12 8h.01" />
               </svg>
-              <span className="text-[1.2rem] absolute left-1/2 -translate-x-1/2 top-full mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-xl before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-b-slate-800">
+              <span className="text-xs md:text-sm absolute left-1/2 -translate-x-1/2 top-full mt-2 md:mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-slate-800 text-white px-3 py-2 md:px-4 rounded-lg font-medium whitespace-nowrap shadow-xl before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-b-slate-800">
                 Learn more about this Website
               </span>
             </button>
