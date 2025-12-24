@@ -2,7 +2,6 @@
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-
 // Utility functions
 function seededRandom(seed) {
   let x = Math.sin(seed++) * 10000;
@@ -598,7 +597,7 @@ export function Header() {
       </AnimatePresence>
       <header className="p-4 md:p-6 lg:p-8 bg-slate-900 flex items-center w-full">
         <ul className="pb-4 md:pb-6 2xl:pb-8 flex flex-row items-center justify-between w-full">
-          <li className="flex items-center gap-3 md:gap-6 lg:gap-7 2xl:gap-9 text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl tracking-wider md:tracking-widest">
+          <li className="flex items-center ml-[3.6rem] max-lg:ml-[1.2rem]  gap-3 md:gap-6 lg:gap-7 2xl:gap-9 text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl tracking-wider md:tracking-widest">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -619,12 +618,12 @@ export function Header() {
             <p>STAR VAULT</p>
           </li>
 
-          <li className="relative flex flex-row items-center gap-4 md:gap-8 lg:gap-12 xl:gap-24 2xl:gap-32">
+          <li className="relative flex flex-row items-center gap-[4.8rem]">
             <button
               onClick={() => setAddModal(true)}
-              className="hover:cursor-pointer px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 md:py-3 2xl:py-4 flex items-center justify-between gap-3 md:gap-4 lg:gap-6 xl:gap-9 2xl:gap-12 rounded-full bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl border-2 border-gray-700"
+              className="hover:cursor-pointer px-[3.2rem] py-[0.6rem] text-[2.4rem] max-lg:text-[1.8rem] flex items-center justify-between gap-[1.8rem] rounded-full bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1  border-2 border-gray-700"
             >
-              <span className="text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl text-blue-500 transform translate-y-[-0.2rem] md:translate-y-[-0.3rem] lg:translate-y-[-0.5rem] 2xl:translate-y-[-0.6rem]">
+              <span className="text-[2.4rem] md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl text-blue-500 transform translate-y-[-0.2rem] md:translate-y-[-0.3rem] lg:translate-y-[-0.5rem] 2xl:translate-y-[-0.6rem]">
                 +
               </span>
               <span>ADD MEMORY</span>
@@ -632,7 +631,7 @@ export function Header() {
 
             <button
               onClick={() => setInfoModal(true)}
-              className="group relative hover:cursor-pointer px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 md:py-3 2xl:py-4 flex items-center justify-between gap-3 md:gap-4 lg:gap-6 xl:gap-9 2xl:gap-12 rounded-full bg-white text-slate-800 font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl border-2 border-amber-400"
+              className="group relative hover:cursor-pointer px-[3.2rem] py-[0.6rem] text-[2.4rem] max-lg:text-[1.8rem] flex items-center justify-between gap-[1.8rem] rounded-full bg-white text-slate-800 font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1   border-2 border-amber-400"
             >
               WHAT IS THIS?
               <svg

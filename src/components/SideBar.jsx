@@ -12,7 +12,6 @@ const colorClasses = {
 
 function SideBar() {
   const location = useLocation();
-  console.log(location);
   const navigate = useNavigate();
 
   return (
