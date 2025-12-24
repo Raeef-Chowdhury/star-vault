@@ -16,7 +16,7 @@ function SideBar() {
   const navigate = useNavigate();
 
   return (
-    <ul className="transform translate-y-[25%] z-20 flex gap-[10rem] max-md:gap-[10rem] absolute flex-col rounded-2xl max-md:flex-row max-md:flex-wrap max-md:top-auto max-md:bottom-8 max-md:left-1/2 max-md:-translate-x-1/2 max-md:translate-y-0  max-md:justify-center max-md:w-full max-md:px-4">
+    <ul className="transform translate-y-[25%] z-20 flex gap-[10rem] max-md:gap-[10rem] absolute flex-col rounded-2xl max-md:flex-row max-md:flex-wrap max-md:top-auto max-md:bottom-24 max-md:left-1/2 max-md:-translate-x-1/2 max-md:translate-y-0  max-md:justify-center max-md:w-full max-md:px-4">
       {sideBar.map((item) => {
         const isActive = location.pathname === `/${item}`;
         return (

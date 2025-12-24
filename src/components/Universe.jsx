@@ -3,10 +3,11 @@
 /* eslint-disable react/prop-types */
 
 import { Canvas } from "@react-three/fiber";
-
 import { OrbitControls } from "@react-three/drei";
 import { motion } from "motion/react";
+import * as THREE from "three";
 import Stars from "../Stars";
+import { useState, useEffect } from "react";
 import SideBar from "./SideBar";
 import CareerGalaxy from "./CareerGalaxy";
 import EmotionGalaxy from "./EmotionGalaxy";
@@ -15,6 +16,18 @@ import PersonalGalaxy from "./PersonalGalaxy";
 import TravelGalaxy from "./TravelGalaxy";
 
 function Scence() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   return (
     <motion.div
       initial={{ opacity: 0, translateX: "-100%" }}
@@ -48,13 +61,19 @@ function Scence() {
           enablePan={false}
           enableZoom={true}
           enableRotate={true}
-          minDistance={50}
+          minDistance={isMobile ? 120 : 50}
           maxDistance={200}
-          blending={1}
-          touches={{
-            ONE: 2,
-            TWO: 1,
+          mouseButtons={{
+            LEFT: THREE.MOUSE.ROTATE,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: null,
           }}
+          touches={{
+            ONE: THREE.TOUCH.ROTATE,
+            TWO: THREE.TOUCH.DOLLY_ROTATE,
+          }}
+          panSpeed={0.5}
+          zoomSpeed={0.5}
         />
       </Canvas>
     </motion.div>

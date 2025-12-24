@@ -15,6 +15,7 @@ import SideBar from "./SideBar";
 import BackButton from "./BackButton";
 import { useStarVault } from "./header";
 import Sphere from "./GalaxySphere";
+import * as THREE from "three";
 
 function EmotionGalaxy({
   count = 6000,
@@ -158,16 +159,22 @@ function EmotionPlanets() {
             />
           ))}
           <OrbitControls
-            enablePan={true}
+            enablePan={false}
             enableZoom={true}
             enableRotate={true}
             minDistance={50}
             maxDistance={200}
-            blending={2}
-            touches={{
-              ONE: 2,
-              TWO: 1,
+            mouseButtons={{
+              LEFT: THREE.MOUSE.ROTATE, // Pan with left mouse button
+              MIDDLE: THREE.MOUSE.DOLLY, // Zoom with middle mouse
+              RIGHT: null, // Disable right mouse
             }}
+            touches={{
+              ONE: THREE.TOUCH.ROTATE, // Pan with one finger
+              TWO: THREE.TOUCH.DOLLY_ROTATE, // Zoom with two fingers (pinch)
+            }}
+            panSpeed={0.5}
+            zoomSpeed={0.5}
           />
         </Canvas>
         {emotionStars.length < 1 && (
