@@ -15,7 +15,6 @@ function Modal({ onClose, sphereData }) {
   };
   const titleCount = sphereData?.title?.length;
   const despCount = sphereData?.description?.length;
-  console.log(despCount, titleCount);
 
   return (
     <Html
@@ -32,7 +31,7 @@ function Modal({ onClose, sphereData }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           onClick={onClose}
-          className="fixed flex justify-center z-[9999] items-center z-[9998] bg-slate-700/10 w-[100vw] h-[100vh] top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] backdrop-blur-md"
+          className="fixed flex justify-center z-[9999] items-center z-[9998] bg-slate-700/10 w-[100vw] h-[2500px] top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] backdrop-blur-md"
         />
 
         {/* Modal Content */}

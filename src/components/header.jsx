@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useState } from "react";
-import { Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 // Utility functions
@@ -56,7 +55,6 @@ function randomPosition(
     attempts++;
   } while (attempts < maxAttempts);
 
-  console.warn(`Could not find valid position after ${maxAttempts} attempts`);
   return [x, y, z];
 }
 
@@ -233,18 +231,18 @@ function InfoModalContent({ setModal }) {
               remove memories as you please.
             </p>
             <p>
-              Each star represents a piece of information youve added — a
-              memory, a reminder, a goal, a feeling, or anything you want to
-              store. Their positions arent random: theyre arranged so that
-              related ideas naturally drift closer together, creating subtle
-              constellations that reflect how your mind groups things.
+              Each star represents a piece of information that you have added,
+              and to add these stars, you can click the add memory modal & fill
+              in the required fields to customize what your memroy fits as well
+              as the category that it belongs to.
             </p>
             <p>
-              You can hover over a star to preview its title, click to open its
-              full details, or drag across the space to journey through your
-              vault. The movement is intentionally smooth and gentle to make the
-              experience feel more like exploring a quiet night sky than
-              navigating a menu.
+              You can click the Back to Universe button to go back on the main
+              page of all the galaxies, and you can pan around the system using
+              your mouse or by gesture in a smaller device. To access the
+              content of a star, you can click on it to open a modal containing
+              all the details of the star including the
+              date,category,title,description, and more.
             </p>
           </div>
         </div>
@@ -601,7 +599,23 @@ export function Header() {
       <header className="p-4 md:p-6 lg:p-8 bg-slate-900 flex items-center w-full">
         <ul className="pb-4 md:pb-6 2xl:pb-8 flex flex-row items-center justify-between w-full">
           <li className="flex items-center gap-3 md:gap-6 lg:gap-7 2xl:gap-9 text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl tracking-wider md:tracking-widest">
-            <Sparkles className="p-3 md:p-4 lg:p-6 2xl:p-8 rounded-full w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 2xl:w-24 2xl:h-24 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-sparkles-icon lucide-sparkles p-3 md:p-4 lg:p-6 2xl:p-8 rounded-full w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 2xl:w-24 2xl:h-24 text-white bg-gradient-to-br from-[#6b9fff] to-[#a78bfa]"
+            >
+              <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+              <path d="M20 2v4" />
+              <path d="M22 4h-4" />
+              <circle cx="4" cy="20" r="2" />
+            </svg>
             <p>STAR VAULT</p>
           </li>
 
